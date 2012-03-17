@@ -1,17 +1,17 @@
 module katze
+open util/ordering[System]
 
 sig System {
    project : RootProject
 }
-
-sig RootProject {
+sig AbstractProject {
    projects : set Project
 }
-
-sig Project extends RootProject {}
+sig RootProject extends AbstractProject{}
+sig Project extends AbstractProject{}
 
 fact no_orphan {
-   all p : RootProject |
+   all p : AbstractProject |
       some s : System |
          p in s.project.*projects
 }
@@ -32,18 +32,21 @@ pred show {
 }
 
 // run show for 5 but 1 System
-open util/ordering[System]
+
 
 pred addProject(s, s' : System, p : Project) {
+   no p.projects
+   not p in s.project.^projects
    s'.project.^projects = s.project.^projects + p
 }
 
 pred project_trace {
    no first.project.projects
    all s : System - last |
-      let s' = next[t] |
+      let s' = next[s] |
          some p : Project |
             addProject[s, s', p]
+   some p : Project | #p.projects > 0
 }
 
-run project_trace for 5
+run project_trace for 5 but 10 AbstractProject
