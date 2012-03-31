@@ -1,7 +1,22 @@
-package org.codefirst.katze.core
+package org.codefirst.katze
 
-import java.util.UUID
-object ID {
-  def get =
-    UUID.randomUUID.toString
+package object core {
+  def using[A <: { def close() : Unit }, B](x : A)( f : A => B) : B =
+    try {
+      f(x)
+    } finally {
+      x.close()
+    }
+
+  def sure[A](body : => A) : Option[A] =
+    try {
+      Some(body)
+    } catch { case _ =>
+      None
+    }
+
+  def tee[A]( x : A)(action : A => Unit) : A = {
+    action(x)
+    x
+  }
 }

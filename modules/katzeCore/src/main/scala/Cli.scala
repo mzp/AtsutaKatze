@@ -1,17 +1,18 @@
 package org.codefirst.katze.cli
 
-import org.codefirst.katze.core.{Project, Status, Open, Close}
+import java.io.File
 import com.beust.jcommander._
+import org.codefirst.katze.core._
 
 trait Command {
-  def execute : Unit
+  def execute(store : Store) : Unit
 }
 
 @Parameters(separators = "=", commandDescription = "List all tickets")
 class CommandList extends Command {
-  def execute {
-    for(t <- Project.current.tickets) {
-      println("%s... %s %s".format(t.uuid.substring(0,4),
+  def execute(store : Store) {
+    for(t <- store.current.tickets) {
+      println("%s... %s %s".format(t.id.short,
                                    status(t.status),
                                    t.subject))
     }
@@ -30,7 +31,10 @@ class CommandAdd extends Command {
   @Parameter(names = Array("-s"), description = "subject")
   var subject : String = ""
 
-  def execute {}
+  def execute( store : Store) {
+    val ticket = Ticket.make(subject, Open)
+    store.apply(Patch.make(AddAction(ticket)))
+  }
 }
 
 @Parameters(separators = "=", commandDescription = "Add ticket")
@@ -52,7 +56,9 @@ object KatzeCli extends App {
     jc.parse(args : _*)
 
     val name = jc.getParsedCommand()
+
+    val store = new Store(new File(".katze"))
     for( obj <- jc.getCommands.asScala(name).getObjects.asScala)
-      obj.asInstanceOf[Command].execute
+      obj.asInstanceOf[Command].execute(store)
   }
 }
