@@ -12,6 +12,13 @@ case class Ticket(
   status  : Status
 )
 
+object Ticket {
+  def make(subject : String, status : Status) =
+    Ticket(ID.get,
+           subject,
+           status)
+}
+
 object TicketProtocol extends DefaultProtocol {
   import JsonSerialization._
 
@@ -25,4 +32,3 @@ object TicketProtocol extends DefaultProtocol {
   implicit val TicketFormat : Format[Ticket] =
     asProduct3("uuid", "subject", "status")(Ticket.apply _)(Ticket.unapply(_).get)
 }
-
