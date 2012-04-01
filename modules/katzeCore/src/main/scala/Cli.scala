@@ -12,9 +12,9 @@ trait Command {
 class CommandList extends Command {
   def execute(store : Store) {
     for(t <- store.current.tickets) {
-      println("%s... %s %s".format(t.id.short,
-                                   status(t.status),
-                                   t.subject))
+      println("%s %s %s".format(t.id.short,
+                                status(t.status),
+                                t.subject))
     }
   }
 
@@ -32,8 +32,17 @@ class CommandAdd extends Command {
   var subject : String = ""
 
   def execute( store : Store) {
-    val ticket = Ticket.make(subject, Open)
+    val ticket = Ticket.make(subject,Open)
     store.apply(Patch.make(AddAction(ticket)))
+  }
+}
+
+@Parameters(commandDescription = "Show changes")
+class CommandChanges extends Command {
+  def execute( store : Store) {
+    for(p <- store.changes) {
+      printf("%s %s\n", p.id.short, p.action.summary)
+    }
   }
 }
 
@@ -52,6 +61,7 @@ object KatzeCli extends App {
 
     jc.addCommand("list",new CommandList())
     jc.addCommand("add", new CommandAdd())
+    jc.addCommand("changes", new CommandChanges())
 
     jc.parse(args : _*)
 

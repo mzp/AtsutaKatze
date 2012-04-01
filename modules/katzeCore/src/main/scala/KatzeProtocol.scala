@@ -6,7 +6,7 @@ import dispatch.json._
 object KatzeProtocol extends DefaultProtocol {
   import JsonSerialization._
 
-  implicit val IDFormat : Format[ID] =
+  implicit def idFormat[T] : Format[ID[T]] =
     wrap("value")(_.value, ID.apply _)
 
   implicit val StatusFormat : Format[Status] =
@@ -51,5 +51,5 @@ object KatzeProtocol extends DefaultProtocol {
     wrap("date")(_.getTime(), new java.util.Date((_ : Long)))
 
   implicit val PatchFormat : Format[Patch] =
-    asProduct3("id", "action", "createdAt")(Patch.apply _)(Patch.unapply(_).get)
+    asProduct4("id", "action", "depends" , "createdAt")(Patch.apply _)(Patch.unapply(_).get)
 }

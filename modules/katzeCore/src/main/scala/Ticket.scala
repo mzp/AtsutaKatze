@@ -5,7 +5,7 @@ case object Open  extends Status
 case object Close extends Status
 
 case class Ticket(
-  id      : ID,
+  id      : ID[Ticket],
   subject : String,
   status  : Status
 )

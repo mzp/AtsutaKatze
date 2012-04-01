@@ -11,3 +11,4 @@ object Project {
   def empty =
     Project(List())
 }
+
