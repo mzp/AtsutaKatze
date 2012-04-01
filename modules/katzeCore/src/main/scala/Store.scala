@@ -105,6 +105,21 @@ class Store(root : File) {
 }
 
 object Store {
+  def isPushable(from : Store, to : Store) : Boolean =
+    to.head match {
+      case Some(head) =>
+        from.changes.contains(head)
+      case None =>
+        true
+    }
+
   def copy(from : Store, to : Store) {
+    if( ! isPushable(from, to) )
+      throw new RuntimeException("not fast foward")
+
+    // TODO: more effective!
+    for( patch <- (from.changes diff to.changes).reverse ) {
+      to.apply(patch)
+    }
   }
 }
