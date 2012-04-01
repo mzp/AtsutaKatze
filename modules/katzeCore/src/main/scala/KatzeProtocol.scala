@@ -25,6 +25,9 @@ object KatzeProtocol extends DefaultProtocol {
   implicit val AddActionFormat : Format[AddAction] =
     wrap("ticket")(_.ticket, AddAction.apply _)
 
+  implicit val DeleteActionFormat : Format[DeleteAction] =
+    wrap("ticket")(_.ticket, DeleteAction.apply _)
+
   implicit object ActionFormat extends Format[Action] {
     def reads(json : JsValue) =
       json match {
@@ -32,6 +35,8 @@ object KatzeProtocol extends DefaultProtocol {
           map(JsString("type")) match {
             case JsString("add") =>
               fromjson[AddAction](map( JsString("action")))
+            case JsString("del") =>
+              fromjson[DeleteAction](map( JsString("action")))
             case _ =>
               throw new RuntimeException("unknown type patch")
           }
@@ -44,6 +49,10 @@ object KatzeProtocol extends DefaultProtocol {
         case act@AddAction(_) =>
           JsObject(Map(JsString("type")   -> JsString("add"),
                        JsString("action") -> tojson(act)))
+        case act@DeleteAction(_) =>
+          JsObject(Map(JsString("type")   -> JsString("del"),
+                       JsString("action") -> tojson(act)))
+
       }
   }
 

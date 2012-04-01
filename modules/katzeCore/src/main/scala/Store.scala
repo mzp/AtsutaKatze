@@ -6,32 +6,6 @@ import scala.collection.mutable.ListBuffer
 import sjson.json._
 import dispatch.json._
 
-case class Patch(
-  id        : ID[Patch],
-  action    : Action,
-  depends   : Option[ID[Patch]],
-  createdAt : Date) {
-}
-
-object Patch {
-  def make(action : Action) =
-    Patch(ID.get, action, None, new Date)
-}
-
-sealed abstract class Action {
-  def apply(project : Project) : Project
-  def summary = toString
-}
-case class AddAction(
-  ticket : Ticket
-) extends Action {
-  def apply(project : Project) =
-    project.copy(tickets = ticket :: project.tickets)
-
-  override def summary =
-    "[addTicket]%s".format(ticket.subject)
-}
-
 class Store(root : File) {
   import JsonSerialization._
   import KatzeProtocol._
@@ -68,6 +42,19 @@ class Store(root : File) {
 
   def patch(id : ID[Patch]) : Option[Patch] =
     read[Patch]("patches/%s".format(id.value))
+
+  def findTicket(id : String) : Either[String, Ticket] = {
+    val xs =
+      current.tickets.filter(_.id.value.startsWith(id))
+    xs match {
+      case List() =>
+        Left("not found ticket")
+      case List(t) =>
+        Right(t)
+      case _ =>
+        Left("Too many ticket")
+    }
+  }
 
   def changes : List[Patch] =
     head.map(changes(_)) getOrElse { List() }

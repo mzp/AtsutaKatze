@@ -38,6 +38,25 @@ object DefaultCommands extends CommandDefinition {
     }
   } }
 
+  define("rm") { new Command {
+    val description =
+      "remove ticket"
+
+    @Parameter(description = "")
+    var ids : java.util.List[String] = null
+
+    def execute(store : Store) {
+      for(id <- ids.asScala) {
+        store.findTicket(id) match {
+          case Left(str) =>
+            println(str)
+          case Right(t) =>
+            store.apply(Patch.make(DeleteAction(t)))
+        }
+      }
+    }
+  } }
+
   define("changes") { new Command {
     val description =
       "show changes"
