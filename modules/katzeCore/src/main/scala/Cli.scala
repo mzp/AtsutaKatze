@@ -61,6 +61,21 @@ class CommandPush extends Command {
   }
 }
 
+@Parameters(commandDescription = "Pull changes")
+class CommandPull extends Command {
+  import scala.collection.JavaConverters._
+
+  @Parameter(description = "")
+  var targets : java.util.List[String] = null
+
+  def execute( store : Store) {
+    for( t <- targets.asScala.headOption ) {
+      val dest = new Store(new File(t))
+      Store.copy(dest, store)
+    }
+  }
+}
+
 @Parameters(separators = "=", commandDescription = "Add ticket")
 class CommandMain {
 }
@@ -78,6 +93,7 @@ object KatzeCli extends App {
     jc.addCommand("add", new CommandAdd())
     jc.addCommand("changes", new CommandChanges())
     jc.addCommand("push", new CommandPush())
+    jc.addCommand("pull", new CommandPull())
 
     jc.parse(args : _*)
 
