@@ -1,7 +1,26 @@
-@(message: String)
+@(tickets : List[org.codefirst.katze.core.Ticket])
 
-@main("Welcome to Play 2.0") {
-    
-    @play20.welcome(message)
-    
+@main("All tickets") {
+  <h1>All tickets</h1>
+  <p>
+    <a href="@routes.Application.newTicketForm"><i class="icon-pencil"></i>new ticket</a>
+  </p>
+  <table class="table-striped table-bordered table tickets">
+    <thead>
+      <tr>
+        <th class="id">ID</th>
+        <th class="status">Status</th>
+        <th class="subject">Subject</th>
+      </tr>
+    </thead>
+    <tbody>
+      @tickets.map { ticket =>
+        <tr>
+          <td>@ticket.id.short</td>
+          <td>@ticket.status</td>
+          <td>@ticket.subject</td>
+        </tr>
+      }
+    </tbody>
+  </table>
 }

@@ -1,0 +1,18 @@
+body{
+    padding-top: 60px;
+}
+table.tickets {
+    width: 800px;
+}
+
+.tickets .id {
+    width: 50px;
+}
+
+.tickets .status {
+    width: 80px;
+}
+
+h1 {
+    margin-bottom: 10px;
+}
