@@ -25,6 +25,9 @@ object KatzeProtocol extends DefaultProtocol {
   implicit val AddActionFormat : Format[AddAction] =
     wrap("ticket")(_.ticket, AddAction.apply _)
 
+  implicit val UpdateActionFormat : Format[UpdateAction] =
+    asProduct2("from", "to")(UpdateAction.apply _)(UpdateAction.unapply(_).get)
+
   implicit val DeleteActionFormat : Format[DeleteAction] =
     wrap("ticket")(_.ticket, DeleteAction.apply _)
 
@@ -35,6 +38,8 @@ object KatzeProtocol extends DefaultProtocol {
           map(JsString("type")) match {
             case JsString("add") =>
               fromjson[AddAction](map( JsString("action")))
+            case JsString("update") =>
+              fromjson[UpdateAction](map( JsString("action")))
             case JsString("del") =>
               fromjson[DeleteAction](map( JsString("action")))
             case _ =>
@@ -48,6 +53,9 @@ object KatzeProtocol extends DefaultProtocol {
       action match {
         case act@AddAction(_) =>
           JsObject(Map(JsString("type")   -> JsString("add"),
+                       JsString("action") -> tojson(act)))
+        case act@UpdateAction(_,_) =>
+          JsObject(Map(JsString("type")   -> JsString("update"),
                        JsString("action") -> tojson(act)))
         case act@DeleteAction(_) =>
           JsObject(Map(JsString("type")   -> JsString("del"),

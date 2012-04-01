@@ -15,6 +15,28 @@ case class AddAction(
     "[addTicket]%s".format(ticket.subject)
 }
 
+case class UpdateAction(
+  from : Ticket,
+  to   : Ticket
+) extends Action {
+  assert(from.id == to.id)
+
+  def apply(project : Project) =
+    project.copy(tickets = project.tickets.map{ t =>
+      if( t.id == from.id )
+        to
+      else
+        t
+    })
+
+  override def summary =
+    "[updateicket]%s -> %s".format(from.subject, to.subject)
+}
+object UpdateAction {
+  def subject(t : Ticket, subject : String) =
+    UpdateAction(t, t.copy(subject = subject))
+}
+
 case class DeleteAction(
   ticket : Ticket
 ) extends Action {
