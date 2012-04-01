@@ -37,6 +37,7 @@ object UpdateAction {
     UpdateAction(t, t.copy(subject = subject))
 }
 
+
 case class DeleteAction(
   ticket : Ticket
 ) extends Action {
