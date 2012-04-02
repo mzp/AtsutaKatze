@@ -1,0 +1,17 @@
+@(patches : List[org.codefirst.katze.core.Patch])
+
+@main("Changes") {
+  <h1>Changes</h1>
+  @patches.map { patch =>
+   <div class="well">
+     <p><i class="icon-tag"></i>@patch.action.summary</p>
+     <dl class="dl-horizontal">
+       <dt>id</dt>
+       <dd>@patch.id.value</dd>
+       <dt>date</dt>
+       <dd>@patch.createdAt</dd>
+     </dl>
+
+   </div>
+  }
+}

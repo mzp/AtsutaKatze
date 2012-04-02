@@ -9,6 +9,7 @@ POST    /new                        controllers.Application.newTicket
 GET     /edit/:id                   controllers.Application.editTicketForm(id : String)
 POST    /edit/:id                   controllers.Application.editTicket(id : String)
 POST    /remove/:id                 controllers.Application.removeTicket(id : String)
+GET     /changes                    controllers.Application.changes
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)

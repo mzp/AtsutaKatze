@@ -64,4 +64,9 @@ object Application extends Controller {
         BadRequest(reason)
     }
   }
+
+  def changes = Action {
+    val changes = store.changes
+    Ok(views.html.changes(changes))
+  }
 }
