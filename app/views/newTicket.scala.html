@@ -1,5 +1,6 @@
 @main("New Ticket") {
   <h1>Create new ticket</h1>
+  @h
   <form action="@routes.Application.newTicket" method="POST">
     <label for="subject">Subject</label>
     <input type="text" class="input-xlarge" id="subject" name="subject" placeholder="your ticket title" autofocus />
