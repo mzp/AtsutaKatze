@@ -55,4 +55,13 @@ object Application extends Controller {
     }
   }
 
+  def removeTicket(id : String) = Action {
+    store.findTicket(id) match {
+      case Right(t) =>
+        store.apply(Patch.make(DeleteAction(t)))
+        Redirect(routes.Application.index)
+      case Left(reason) =>
+        BadRequest(reason)
+    }
+  }
 }

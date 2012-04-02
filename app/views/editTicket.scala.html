@@ -1,0 +1,15 @@
+@(ticket : org.codefirst.katze.core.Ticket, form : Form[org.codefirst.katze.core.Ticket])
+
+@import helper.twitterBootstrap._
+
+@main("Edit Ticket"){
+  <h1>Edit: @ticket.id.value</h1>
+  @helper.form(action = routes.Application.editTicket(ticket.id.value)) {
+    @helper.inputText(form("subject"))
+
+    <div class="form-actions">
+      <input type="submit" value="Update" class="btn btn-primary"/>
+    </div>
+  }
+}
+

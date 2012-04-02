@@ -1,6 +1,8 @@
 @(tickets : List[org.codefirst.katze.core.Ticket])
 
 @main("All tickets") {
+  <script src="@routes.Assets.at("javascripts/bootbox.min.js")" type="text/javascript"></script>
+  <script src="@routes.Assets.at("javascripts/index.js")" type="text/javascript"></script>
   <h1>All tickets</h1>
   <p>
     <a href="@routes.Application.newTicketForm"><i class="icon-pencil"></i>new ticket</a>
@@ -11,16 +13,34 @@
         <th class="id">ID</th>
         <th class="status">Status</th>
         <th class="subject">Subject</th>
+        <th class="actions"></th>
       </tr>
     </thead>
     <tbody>
       @tickets.map { ticket =>
         <tr>
-          <td>@ticket.id.short</td>
-          <td>@ticket.status</td>
-          <td>@ticket.subject</td>
+          <td>
+            <a href="@routes.Application.editTicketForm(ticket.id.value)">@ticket.id.short</a>
+          </td>
+          <td>
+            <a href="@routes.Application.editTicketForm(ticket.id.value)">@ticket.status</a>
+          </td>
+          <td>
+            <a href="@routes.Application.editTicketForm(ticket.id.value)">@ticket.subject</a>
+          <td>
+            <a href="@routes.Application.editTicketForm(ticket.id.value)"><i class="icon-edit"></i></a>
+            <a href="#" class="data-remove" data-id="@ticket.id.value"><i class="icon-remove"></i></a>
+          </td>
         </tr>
       }
     </tbody>
   </table>
+
+  <script type="text/javascript">
+    var AtsutaKatze = {
+      routes : {
+        removeTicket : "@routes.Application.removeTicket("")"
+      }
+    }
+  </script>
 }
