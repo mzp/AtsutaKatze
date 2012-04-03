@@ -28,4 +28,3 @@ class LocalStoreSpec extends Specification {
     }
   }
 }
-
