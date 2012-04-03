@@ -15,7 +15,7 @@ object DefaultCommands extends CommandDefinition {
       Map(Open  -> " ",
           Close -> "x" )
 
-    def execute(store : Store) {
+    def execute(store : Repository) {
       for(t <- store.current.tickets) {
         printf("%s %s %s\n",
                t.id.value,
@@ -32,7 +32,7 @@ object DefaultCommands extends CommandDefinition {
     @Parameter(names = Array("-s"), description = "subject")
     var subject : String = ""
 
-    def execute( store : Store) {
+    def execute( store : Repository) {
       val ticket = Ticket.make(subject,Open)
       store.apply(Patch.make(AddAction(ticket)))
     }
@@ -48,7 +48,7 @@ object DefaultCommands extends CommandDefinition {
     @Parameter(description = "")
     var ids : java.util.List[String] = null
 
-    def execute(store : Store) {
+    def execute(store : Repository) {
       for(id <- ids.asScala) {
         store.findTicket(id) match {
           case Left(str) =>
@@ -67,7 +67,7 @@ object DefaultCommands extends CommandDefinition {
     @Parameter(description = "")
     var ids : java.util.List[String] = null
 
-    def execute(store : Store) {
+    def execute(store : Repository) {
       for(id <- ids.asScala) {
         store.findTicket(id) match {
           case Left(str) =>
@@ -83,7 +83,7 @@ object DefaultCommands extends CommandDefinition {
     val description =
       "show changes"
 
-    def execute( store : Store) {
+    def execute( store : Repository) {
       for(p <- store.changes) {
         printf("%s %s\n", p.id.short, p.action.summary)
       }
@@ -97,10 +97,10 @@ object DefaultCommands extends CommandDefinition {
     @Parameter(description = "")
     var targets : java.util.List[String] = null
 
-    def execute( store : Store) {
+    def execute( store : Repository) {
       for( t <- targets.asScala ) {
-        val dest = new Store(new File(t))
-        Store.copy(store, dest)
+        val dest = Repository.local(t)
+        Repository.copy(store, dest)
       }
     }
   } }
@@ -112,13 +112,11 @@ object DefaultCommands extends CommandDefinition {
     @Parameter(description = "")
     var targets : java.util.List[String] = null
 
-    def execute( store : Store) {
+    def execute( store : Repository) {
       for( t <- targets.asScala.headOption ) {
-        val dest = new Store(new File(t))
-        Store.copy(dest, store)
+        val dest = Repository.local(t)
+        Repository.copy(dest, store)
       }
     }
   } }
 }
-
-

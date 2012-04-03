@@ -2,7 +2,7 @@ package org.codefirst.katze.cli
 
 import java.io.File
 import com.beust.jcommander._
-import org.codefirst.katze.core.Store
+import org.codefirst.katze.core.Repository
 
 object CommandMain {}
 
@@ -11,7 +11,7 @@ object Cli extends App {
 
   override def main(args : Array[String]) = {
     val store =
-      new Store(new File(".katze"))
+      Repository.local(".katze")
 
     val jc =
       new KatzeCommander(CommandMain)

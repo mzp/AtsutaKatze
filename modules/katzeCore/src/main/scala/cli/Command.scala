@@ -2,10 +2,10 @@ package org.codefirst.katze.cli
 
 import scala.collection.mutable.ListBuffer
 import com.beust.jcommander.JCommander
-import org.codefirst.katze.core.Store
+import org.codefirst.katze.core.Repository
 
 trait Command {
-  def execute(store : Store) : Unit
+  def execute(store : Repository) : Unit
   def description : String
 }
 
