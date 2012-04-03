@@ -18,7 +18,8 @@ class SSHStore(uri : java.net.URI, exec : String => String = SSHStore.shell _) e
 
   def write[T](name : String, obj : T)(implicit fjs : Writes[T]) {
     val json = tojson(obj)
-    exec("cat '%s' | %s".format(json,
+    exec(ssh("mkdir -p %s").format(dir(name)))
+    exec("echo '%s' | %s".format(json,
                                 ssh("cat > %s").format(path(name))))
   }
 
@@ -35,6 +36,11 @@ class SSHStore(uri : java.net.URI, exec : String => String = SSHStore.shell _) e
     val file = new File(uri.getPath, name)
     file.getAbsolutePath
   }
+
+  private def dir(name : String) : String = {
+    val file = new File(uri.getPath, name)
+    file.getParentFile.getAbsolutePath
+  }
 }
 
 object SSHStore {
@@ -46,13 +52,16 @@ object SSHStore {
 
       while(len >= buffer.length) {
         len = is.read(buffer)
-        bas.write(buffer, 0, len)
+        if(len > 0) {
+          bas.write(buffer, 0, len)
+        }
       }
 
       new String(bas.toByteArray)
     }
 
   def shell(cmd : String) : String = {
+    println(cmd)
     val process = Runtime.getRuntime().exec(Array("/bin/sh", "-c", cmd))
     process.waitFor
     val is = process.getInputStream()

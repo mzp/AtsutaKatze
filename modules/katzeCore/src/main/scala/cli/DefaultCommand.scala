@@ -99,7 +99,7 @@ object DefaultCommands extends CommandDefinition {
 
     def execute( store : Repository) {
       for( t <- targets.asScala ) {
-        val dest = Repository.local(t)
+        val dest = Repository.open(t)
         Repository.copy(store, dest)
       }
     }
@@ -114,7 +114,7 @@ object DefaultCommands extends CommandDefinition {
 
     def execute( store : Repository) {
       for( t <- targets.asScala.headOption ) {
-        val dest = Repository.local(t)
+        val dest = Repository.open(t)
         Repository.copy(dest, store)
       }
     }

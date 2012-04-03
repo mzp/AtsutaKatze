@@ -1,9 +1,8 @@
 package org.codefirst.katze.core
 
-import store.Store
+import store._
 import java.util.Date
 import scala.collection.mutable.ListBuffer
-import store.LocalStore
 import java.io.File
 
 class Repository(store : Store) {
@@ -84,4 +83,16 @@ object Repository {
 
   def local(path : String) =
     new Repository(new LocalStore(new File(path)))
+
+  def open(uri : String) = {
+    val x = new java.net.URI(uri)
+    val store = x.getScheme match {
+      case "file" =>
+        new LocalStore(new File(x.getPath))
+      case "ssh" =>
+        new SSHStore(x)
+    }
+    println(store)
+    new Repository(store)
+  }
 }
