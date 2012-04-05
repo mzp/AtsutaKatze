@@ -41,7 +41,7 @@ class SSHStoreSpec extends Specification {
     store.write("path/to/file", x)
 
     "ssh catでファイルを書き込む" in {
-      lastCommand must_== "cat '{\"value\" : \"42\"}' | ssh -p 22 example.com 'cat > /tmp/path/to/file'"
+      lastCommand must_== "echo '{\"value\" : \"42\"}' | ssh -p 22 example.com 'cat > /tmp/path/to/file'"
     }
   }
 
