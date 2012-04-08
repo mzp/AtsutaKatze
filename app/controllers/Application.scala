@@ -10,7 +10,7 @@ object Application extends Controller {
   import play.api.data.Forms._
 
   def store =
-    new Store(new File(".katze"))
+    Repository.local(".katze")
 
   val ticketForm  = Form {
     mapping(
