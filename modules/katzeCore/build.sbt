@@ -11,3 +11,6 @@ libraryDependencies += "com.beust" % "jcommander" % "1.23"
 scalacOptions += "-deprecation"
 
 scalacOptions += "-unchecked"
+
+
+libraryDependencies += "redis.clients" % "jedis" % "2.0.0"
