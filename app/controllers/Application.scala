@@ -5,12 +5,41 @@ import play.api._
 import play.api.mvc._
 import play.api.data._
 import org.codefirst.katze.core._
+import org.codefirst.katze.core.store._
+
 
 object Application extends Controller {
   import play.api.data.Forms._
+  import play.api.Play.current
 
-  def store =
-    Repository.local(".katze")
+
+  val storeMap = Map[String, Configuration => Option[Store]](
+    "local" -> { cf =>
+      cf.getString("path") map { path =>
+        new LocalStore(new File(path))
+      }
+     },
+    "redis" -> { cf =>
+      cf.getString("url") map { url =>
+        new RedisStore(url)
+      }
+    }
+  )
+
+  val store : Option[Store] = for {
+    config     <- Play.configuration.getConfig("store")
+    storeType  <- config.getString("type")
+    params     <- config.getConfig(storeType)
+    store      <- storeMap(storeType)(params)
+  } yield store
+
+  def repository : Repository =
+    store match {
+      case Some(s) =>
+        new Repository(s)
+      case None =>
+        throw new RuntimeException("store is not configured")
+    }
 
   val ticketForm  = Form {
     mapping(
@@ -19,7 +48,7 @@ object Application extends Controller {
   }
 
   def index = Action {
-    val tickets = store.current.tickets
+    val tickets = repository.current.tickets
     Ok(views.html.index(tickets))
   }
 
@@ -30,12 +59,12 @@ object Application extends Controller {
 
   def newTicket = Action { implicit request =>
     val ticket = ticketForm.bindFromRequest.get
-    store.apply(Patch.make(AddAction(ticket)))
+    repository.apply(Patch.make(AddAction(ticket)))
     Redirect(routes.Application.index)
   }
 
   def editTicketForm(id : String) = Action {
-    store.findTicket(id) match {
+    repository.findTicket(id) match {
       case Right(t) =>
         val form = ticketForm.fill(t)
         Ok(views.html.editTicket(t, form))
@@ -45,10 +74,10 @@ object Application extends Controller {
   }
 
   def editTicket(id : String) = Action { implicit request =>
-    store.findTicket(id) match {
+    repository.findTicket(id) match {
       case Right(t) =>
         val next = ticketForm.bindFromRequest.get
-        store.apply(Patch.make(UpdateAction.subject(t, next.subject)))
+        repository.apply(Patch.make(UpdateAction.subject(t, next.subject)))
         Redirect(routes.Application.index)
       case Left(reason) =>
         BadRequest(reason)
@@ -56,9 +85,9 @@ object Application extends Controller {
   }
 
   def removeTicket(id : String) = Action {
-    store.findTicket(id) match {
+    repository.findTicket(id) match {
       case Right(t) =>
-        store.apply(Patch.make(DeleteAction(t)))
+        repository.apply(Patch.make(DeleteAction(t)))
         Redirect(routes.Application.index)
       case Left(reason) =>
         BadRequest(reason)
@@ -66,7 +95,7 @@ object Application extends Controller {
   }
 
   def changes = Action {
-    val changes = store.changes
+    val changes = repository.changes
     Ok(views.html.changes(changes))
   }
 }
