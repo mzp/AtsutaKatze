@@ -4,15 +4,23 @@ import store._
 import java.util.Date
 import scala.collection.mutable.ListBuffer
 import java.io.File
+import sjson.json.{Reads,Writes, JsonSerialization}
 
 class Repository(store : Store) {
+  import JsonSerialization._
   import KatzeProtocol._
 
+  def read[T](name : String)(implicit fjs : Reads[T]) : Option[T] =
+    store.read(name).map(fromjson[T](_)(fjs))
+
+  def write[T](name : String, obj : T)(implicit fjs : Writes[T]) : Unit =
+    store.write(name, tojson(obj)(fjs))
+
   def head : Option[Patch] =
-    store.read[ID[Patch]]("head").flatMap(patch(_))
+    read[ID[Patch]]("head").flatMap(patch(_))
 
   def patch(id : ID[Patch]) : Option[Patch] =
-    store.read[Patch]("patches/%s".format(id.value))
+    read[Patch]("patches/%s".format(id.value))
 
   def changes : List[Patch] =
     head.map(changes(_)) getOrElse { List() }
@@ -42,7 +50,7 @@ class Repository(store : Store) {
 
   // TODO: need file lock
   def current : Project =
-    store.read[Project]("current") getOrElse {
+    read[Project]("current") getOrElse {
       Project.empty
     }
 
@@ -56,9 +64,9 @@ class Repository(store : Store) {
     }
     val project = next.action(current)
 
-    store.write("current", project)
-    store.write("patches/%s".format(next.id.value), next)
-    store.write("head", next.id)
+    write("current", project)
+    write("patches/%s".format(next.id.value), next)
+    write("head", next.id)
   }
 }
 

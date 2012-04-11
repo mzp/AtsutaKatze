@@ -11,11 +11,11 @@ class RepositorySpec extends Specification {
   class MemoryStore extends store.Store {
     val map : mutable.Map[String, JsValue] = mutable.Map()
 
-    def read[T](name : String)(implicit fjs : Reads[T]) : Option[T] =
-      map.get(name).map(fjs.reads(_))
+    def read(name : String) =
+      map.get(name)
 
-    def write[T](name : String, obj : T)(implicit fjs : Writes[T]) {
-      map.update(name, fjs.writes(obj))
+    def write(name : String, obj : JsValue) {
+      map.update(name, obj)
     }
   }
 

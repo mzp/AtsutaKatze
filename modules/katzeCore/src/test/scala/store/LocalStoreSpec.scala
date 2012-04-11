@@ -12,19 +12,25 @@ class LocalStoreSpec extends Specification {
   import KatzeProtocol._
 
   val store = new LocalStore(new File(".test"))
-  type T = ID[Any]
-  val  x : T = ID("xxx")
+
+  val rand =
+    new scala.util.Random
+
+  val value = {
+    val x = rand.nextInt.toString
+    JsValue.fromString(x)
+  }
 
   "read" should {
     "キーが存在しなければ失敗する" in {
-      store.read[T]("non-exist-key") must_== None
+      store.read("non-exist-key") must_== None
     }
   }
 
   "write" should {
     "書き込んだ値を読める" in {
-      store.write("key", x)
-      store.read[T]("key") must_== Some(x)
+      store.write("key", value)
+      store.read("key") must_== Some(value)
     }
   }
 }
