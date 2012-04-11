@@ -6,41 +6,9 @@ import play.api.mvc._
 import play.api.data._
 import org.codefirst.katze.core._
 import org.codefirst.katze.core.store._
-import play.api.libs.json._
 
 object Application extends Controller {
   import play.api.data.Forms._
-  import play.api.Play.current
-  import Json._
-
-
-  val storeMap = Map[String, Configuration => Option[Store]](
-    "local" -> { cf =>
-      cf.getString("path") map { path =>
-        new LocalStore(new File(path))
-      }
-     },
-    "redis" -> { cf =>
-      cf.getString("url") map { url =>
-        new RedisStore(url)
-      }
-    }
-  )
-
-  val store : Option[Store] = for {
-    config     <- Play.configuration.getConfig("store")
-    storeType  <- config.getString("type")
-    params     <- config.getConfig(storeType)
-    store      <- storeMap(storeType)(params)
-  } yield store
-
-  def repository : Repository =
-    store match {
-      case Some(s) =>
-        new Repository(s)
-      case None =>
-        throw new RuntimeException("store is not configured")
-    }
 
   val ticketForm  = Form {
     mapping(
@@ -49,7 +17,7 @@ object Application extends Controller {
   }
 
   def index = Action {
-    val tickets = repository.current.tickets
+    val tickets = Katze.repository.current.tickets
     Ok(views.html.index(tickets))
   }
 
@@ -60,12 +28,12 @@ object Application extends Controller {
 
   def newTicket = Action { implicit request =>
     val ticket = ticketForm.bindFromRequest.get
-    repository.apply(Patch.make(AddAction(ticket)))
+    Katze.repository.apply(Patch.make(AddAction(ticket)))
     Redirect(routes.Application.index)
   }
 
   def editTicketForm(id : String) = Action {
-    repository.findTicket(id) match {
+    Katze.repository.findTicket(id) match {
       case Right(t) =>
         val form = ticketForm.fill(t)
         Ok(views.html.editTicket(t, form))
@@ -75,10 +43,10 @@ object Application extends Controller {
   }
 
   def editTicket(id : String) = Action { implicit request =>
-    repository.findTicket(id) match {
+    Katze.repository.findTicket(id) match {
       case Right(t) =>
         val next = ticketForm.bindFromRequest.get
-        repository.apply(Patch.make(UpdateAction.subject(t, next.subject)))
+        Katze.repository.apply(Patch.make(UpdateAction.subject(t, next.subject)))
         Redirect(routes.Application.index)
       case Left(reason) =>
         BadRequest(reason)
@@ -86,9 +54,9 @@ object Application extends Controller {
   }
 
   def removeTicket(id : String) = Action {
-    repository.findTicket(id) match {
+    Katze.repository.findTicket(id) match {
       case Right(t) =>
-        repository.apply(Patch.make(DeleteAction(t)))
+        Katze.repository.apply(Patch.make(DeleteAction(t)))
         Redirect(routes.Application.index)
       case Left(reason) =>
         BadRequest(reason)
@@ -96,30 +64,7 @@ object Application extends Controller {
   }
 
   def changes = Action {
-    val changes = repository.changes
+    val changes = Katze.repository.changes
     Ok(views.html.changes(changes))
-  }
-
-  def getStore(name : String) = Action {
-    val ret = for {
-      s <- store
-      value <- s read name
-    } yield Json.parse(value.toString)
-
-
-    ret match {
-      case Some(json) =>
-        Ok(toJson(Map("status"-> JsString("ok"),
-                      "content" ->json)))
-      case None =>
-        NotFound(toJson(Map("status" -> "ng")))
-    }
-  }
-
-  def setStore(name : String) = Action(parse.json) { request =>
-    val s = Json.stringify(request.body)
-    val json = dispatch.json.JsValue.fromString(s)
-    store.map(_.write(name, json))
-    Ok(toJson(Map("status" -> "ok")))
   }
 }
