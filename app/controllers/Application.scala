@@ -6,11 +6,12 @@ import play.api.mvc._
 import play.api.data._
 import org.codefirst.katze.core._
 import org.codefirst.katze.core.store._
-
+import play.api.libs.json._
 
 object Application extends Controller {
   import play.api.data.Forms._
   import play.api.Play.current
+  import Json._
 
 
   val storeMap = Map[String, Configuration => Option[Store]](
@@ -97,5 +98,28 @@ object Application extends Controller {
   def changes = Action {
     val changes = repository.changes
     Ok(views.html.changes(changes))
+  }
+
+  def getStore(name : String) = Action {
+    val ret = for {
+      s <- store
+      value <- s read name
+    } yield Json.parse(value.toString)
+
+
+    ret match {
+      case Some(json) =>
+        Ok(toJson(Map("status"-> JsString("ok"),
+                      "content" ->json)))
+      case None =>
+        NotFound(toJson(Map("status" -> "ng")))
+    }
+  }
+
+  def setStore(name : String) = Action(parse.json) { request =>
+    val s = Json.stringify(request.body)
+    val json = dispatch.json.JsValue.fromString(s)
+    store.map(_.write(name, json))
+    Ok(toJson(Map("status" -> "ok")))
   }
 }

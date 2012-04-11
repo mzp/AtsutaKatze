@@ -97,10 +97,9 @@ object Repository {
     val store = x.getScheme match {
       case "file" =>
         new LocalStore(new File(x.getPath))
-      case "ssh" =>
-        new SSHStore(x)
+      case "http" =>
+        new HttpStore(x)
     }
-    println(store)
     new Repository(store)
   }
 }

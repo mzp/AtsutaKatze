@@ -14,3 +14,6 @@ scalacOptions += "-unchecked"
 
 
 libraryDependencies += "redis.clients" % "jedis" % "2.0.0"
+
+
+libraryDependencies += "net.databinder" %% "dispatch-http" % "0.8.8"
