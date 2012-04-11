@@ -33,7 +33,7 @@ object Application extends Controller {
   }
 
   def editTicketForm(id : String) = Action {
-    Katze.repository.findTicket(id) match {
+    Katze.repository.ticket(id) match {
       case Right(t) =>
         val form = ticketForm.fill(t)
         Ok(views.html.editTicket(t, form))
@@ -43,7 +43,7 @@ object Application extends Controller {
   }
 
   def editTicket(id : String) = Action { implicit request =>
-    Katze.repository.findTicket(id) match {
+    Katze.repository.ticket(id) match {
       case Right(t) =>
         val next = ticketForm.bindFromRequest.get
         Katze.repository.apply(Patch.make(UpdateAction.subject(t, next.subject)))
@@ -54,7 +54,7 @@ object Application extends Controller {
   }
 
   def removeTicket(id : String) = Action {
-    Katze.repository.findTicket(id) match {
+    Katze.repository.ticket(id) match {
       case Right(t) =>
         Katze.repository.apply(Patch.make(DeleteAction(t)))
         Redirect(routes.Application.index)

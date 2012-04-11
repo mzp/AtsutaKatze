@@ -10,10 +10,11 @@ class Repository(store : Store) {
   import JsonSerialization._
   import KatzeProtocol._
 
-  def read[T](name : String)(implicit fjs : Reads[T]) : Option[T] =
+
+  private def read[T](name : String)(implicit fjs : Reads[T]) : Option[T] =
     store.read(name).map(fromjson[T](_)(fjs))
 
-  def write[T](name : String, obj : T)(implicit fjs : Writes[T]) : Unit =
+  private def write[T](name : String, obj : T)(implicit fjs : Writes[T]) : Unit =
     store.write(name, tojson(obj)(fjs))
 
   def head : Option[Patch] =
@@ -35,7 +36,7 @@ class Repository(store : Store) {
     buffer.toList
   }
 
-  def findTicket(id : String) : Either[String, Ticket] = {
+  def ticket(id : String) : Either[String, Ticket] = {
     val xs =
       current.tickets.filter(_.id.value.startsWith(id))
     xs match {

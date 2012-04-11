@@ -68,11 +68,11 @@ class RepositorySpec extends Specification {
     }
 
     "チケットが取得できる" in {
-      repos.findTicket(t2.id.value) must_== Right(t2)
+      repos.ticket(t2.id.value) must_== Right(t2)
     }
 
     "IDの一部でもチケットが取得できる" in {
-      repos.findTicket(t2.id.value.substring(0, 5)) must_== Right(t2)
+      repos.ticket(t2.id.value.substring(0, 5)) must_== Right(t2)
     }
   }
 }

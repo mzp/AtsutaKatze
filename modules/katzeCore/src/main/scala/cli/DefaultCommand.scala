@@ -50,7 +50,7 @@ object DefaultCommands extends CommandDefinition {
 
     def execute(store : Repository) {
       for(id <- ids.asScala) {
-        store.findTicket(id) match {
+        store.ticket(id) match {
           case Left(str) =>
             println(str)
           case Right(t) =>
@@ -69,7 +69,7 @@ object DefaultCommands extends CommandDefinition {
 
     def execute(store : Repository) {
       for(id <- ids.asScala) {
-        store.findTicket(id) match {
+        store.ticket(id) match {
           case Left(str) =>
             println(str)
           case Right(t) =>
