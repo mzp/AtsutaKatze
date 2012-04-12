@@ -119,4 +119,26 @@ object DefaultCommands extends CommandDefinition {
       }
     }
   } }
+
+  define("repos") { new Command {
+    val description =
+      "set repository"
+
+    @Parameter(description = "")
+    var repositories : java.util.List[String] = null
+
+    def execute( repository : Repository) {
+      Option(repositories).flatMap(_.asScala.headOption) match {
+        case None =>
+          // read mode
+          val s =
+            repository.config(repository.current).repository getOrElse { "<none>" }
+          println(s)
+        case Some(url) =>
+          repository.updateConfig(repository.current) {
+            _.copy(repository = Some(url))
+          }
+      }
+    }
+  } }
 }

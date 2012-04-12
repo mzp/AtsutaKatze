@@ -10,7 +10,6 @@ class Repository(store : Store) {
   import JsonSerialization._
   import KatzeProtocol._
 
-
   private def read[T](name : String)(implicit fjs : Reads[T]) : Option[T] =
     store.read(name).map(fromjson[T](_)(fjs))
 
@@ -68,6 +67,18 @@ class Repository(store : Store) {
     write("current", project)
     write("patches/%s".format(next.id.value), next)
     write("head", next.id)
+  }
+
+  def config(project : Project) : ProjectConfig = {
+    read[ProjectConfig]("config/%s".format(project.id.value)) getOrElse {
+      ProjectConfig.empty
+    }
+  }
+
+  def updateConfig(project : Project)(f : ProjectConfig => ProjectConfig) {
+    val config =
+      f(this.config(project))
+    write("config/%s".format(project.id.value), config)
   }
 }
 
