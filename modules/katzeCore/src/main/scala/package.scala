@@ -10,8 +10,9 @@ package object core {
 
   def sure[A](body : => A) : Option[A] =
     try {
-      Some(body)
-    } catch { case _ =>
+      Option(body)
+    } catch { case e =>
+      println(e)
       None
     }
 

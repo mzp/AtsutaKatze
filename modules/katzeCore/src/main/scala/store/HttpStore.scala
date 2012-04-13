@@ -1,29 +1,40 @@
 package org.codefirst.katze.core.store
 
 import dispatch._
-import dispatch.json._
+import dispatch.json.{JsValue, JsObject, JsString}
+import java.io.InputStream
 
-class HttpStore(uri : java.net.URI) extends Store {
+trait HttpExecutor {
+  def put(url : String, body : String) : Unit
+  def get[T](url : String)(f : InputStream => T) : T
+}
+
+object DefaultHttpExecutor extends HttpExecutor {
+  def put(url : String, body : String)  =
+    Http(dispatch.url(url) <<< body >|)
+
+  def get[T](url : String)(f : InputStream => T) =
+    Http(dispatch.url(url) >> f)
+}
+
+class HttpStore(uri : java.net.URI,
+                http : HttpExecutor = DefaultHttpExecutor) extends Store {
   import org.codefirst.katze.core._
-  import Http._
 
   val entry =
-    url(uri.toString) / "api" / "v1"
+    uri.toString + "/api/v1/"
 
   def read(name : String) = {
-    val x = sure {
-      Http(entry / name >> { in =>
+    sure {
+      http.get[JsValue](entry + name) { in =>
         val json = JsValue.fromStream(in)
         json.asInstanceOf[JsObject].self(JsString("content"))
-      })
+      }
     }
-    println(x)
-    x
   }
 
   def write(name : String, value : JsValue) {
-    val s : String = value.toString
-    println(s)
-    Http(entry / name <<< s >|)
+    http.put(entry + name, value.toString)
   }
 }
+
