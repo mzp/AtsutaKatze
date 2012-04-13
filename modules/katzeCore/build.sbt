@@ -8,12 +8,14 @@ libraryDependencies += "net.debasishg" %% "sjson" % "0.17"
 
 libraryDependencies += "com.beust" % "jcommander" % "1.23"
 
+libraryDependencies += "redis.clients" % "jedis" % "2.0.0"
+
+libraryDependencies += "net.databinder" %% "dispatch-http" % "0.8.8"
+
+libraryDependencies += "junit" % "junit" % "4.9" % "test"
+
 scalacOptions += "-deprecation"
 
 scalacOptions += "-unchecked"
 
-
-libraryDependencies += "redis.clients" % "jedis" % "2.0.0"
-
-
-libraryDependencies += "net.databinder" %% "dispatch-http" % "0.8.8"
+testOptions in Test += Tests.Argument("junitxml", "console")
