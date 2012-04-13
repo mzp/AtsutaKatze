@@ -12,7 +12,6 @@ package object core {
     try {
       Option(body)
     } catch { case e =>
-      println(e)
       None
     }
 

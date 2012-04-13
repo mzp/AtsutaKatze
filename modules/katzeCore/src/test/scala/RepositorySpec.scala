@@ -75,5 +75,24 @@ class RepositorySpec extends Specification {
       repos.ticket(t2.id.value.substring(0, 5)) must_== Right(t2)
     }
   }
+
+  "プロジェクトごとの設定" should {
+    "diffを生成しない" in {
+      val repos =  repository()
+      repos.updateConfig(repos.current)(_)
+      repos.changes must_== List()
+    }
+
+    "初期状態は空" in {
+      val repos =  repository()
+      repos.config(repos.current) must_== ProjectConfig.empty
+    }
+
+    "更新できる" in {
+      val repos =  repository()
+      repos.updateConfig(repos.current)(_.copy(repository = Some("x")))
+      repos.config(repos.current).repository must_== Some("x")
+    }
+  }
 }
 
