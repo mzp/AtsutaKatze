@@ -19,3 +19,6 @@ scalacOptions += "-deprecation"
 scalacOptions += "-unchecked"
 
 testOptions in Test += Tests.Argument("junitxml", "console")
+
+
+libraryDependencies += "org.eclipse.jgit" % "org.eclipse.jgit" % "1.3.0.201202151440-r"
