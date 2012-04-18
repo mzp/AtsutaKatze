@@ -23,7 +23,7 @@ object KatzeProtocol extends DefaultProtocol {
     asProduct2("id","tickets")(Project.apply _)(Project.unapply(_).get)
 
   implicit val ProjectCOnfigFormat : Format[ProjectConfig] =
-    wrap("repository")(_.repository, ProjectConfig.apply _)
+    wrap("scm")(_.scm, ProjectConfig.apply _)
 
   implicit val AddActionFormat : Format[AddAction] =
     wrap("ticket")(_.ticket, AddAction.apply _)

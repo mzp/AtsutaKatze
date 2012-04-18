@@ -120,7 +120,7 @@ object DefaultCommands extends CommandDefinition {
     }
   } }
 
-  define("repos") { new Command {
+  define("scm") { new Command {
     val description =
       "set repository"
 
@@ -132,11 +132,11 @@ object DefaultCommands extends CommandDefinition {
         case None =>
           // read mode
           val s =
-            repository.config(repository.current).repository getOrElse { "<none>" }
+            repository.config(repository.current).scm getOrElse { "<none>" }
           println(s)
         case Some(url) =>
           repository.updateConfig(repository.current) {
-            _.copy(repository = Some(url))
+            _.copy(scm = Some(url))
           }
       }
     }

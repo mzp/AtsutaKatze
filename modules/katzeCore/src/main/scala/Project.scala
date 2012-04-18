@@ -12,7 +12,7 @@ object Project {
 
 // non sharable conifg
 case class ProjectConfig(
-  repository : Option[String]
+  scm: Option[String]
 )
 
 object ProjectConfig {

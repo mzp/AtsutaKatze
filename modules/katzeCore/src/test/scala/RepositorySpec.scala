@@ -90,8 +90,8 @@ class RepositorySpec extends Specification {
 
     "更新できる" in {
       val repos =  repository()
-      repos.updateConfig(repos.current)(_.copy(repository = Some("x")))
-      repos.config(repos.current).repository must_== Some("x")
+      repos.updateConfig(repos.current)(_.copy(scm = Some("x")))
+      repos.config(repos.current).scm must_== Some("x")
     }
   }
 }
