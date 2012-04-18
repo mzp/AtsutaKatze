@@ -19,7 +19,7 @@ git commit -m 'refs: some-id'
 """
     Runtime.getRuntime.exec(Array("sh","-c", command))
 
-    val git = new Git("/tmp/git")
+    val git = new Git("/tmp/katze-test/git")
     "ログを取得できる(失敗)" in {
       git.commits(ID("non-exist")) must have size(0)
     }
