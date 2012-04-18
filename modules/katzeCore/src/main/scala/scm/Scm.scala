@@ -9,5 +9,6 @@ case class Commit(
 )
 
 trait Scm {
+  def url : String
   def commits(id : ID[Ticket]) : Iterable[Commit]
 }

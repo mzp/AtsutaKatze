@@ -9,7 +9,7 @@ import scala.collection.JavaConverters._
 
 import org.codefirst.katze.core.{ID,Ticket}
 
-class Git(url : String) extends Scm {
+class Git(val url : String) extends Scm {
   lazy val repos = {
     val builder = new FileRepositoryBuilder()
     val file =new java.io.File(url)

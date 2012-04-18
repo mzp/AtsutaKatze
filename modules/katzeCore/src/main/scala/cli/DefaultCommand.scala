@@ -131,14 +131,43 @@ object DefaultCommands extends CommandDefinition {
       Option(repositories).flatMap(_.asScala.headOption) match {
         case None =>
           // read mode
-          val s =
-            repository.config(repository.current).scm getOrElse { "<none>" }
-          println(s)
+          val project =
+            repository.current
+          val url =
+            project.scm(repository).map(_.url) getOrElse { "<none>" }
+          println(url)
         case Some(url) =>
+          // write mode
           repository.updateConfig(repository.current) {
             _.copy(scm = Some(url))
           }
       }
     }
   } }
+
+  define("commits") { new Command {
+    val description =
+      "show related commits"
+
+    @Parameter(description = "")
+    var tickets : java.util.List[String] = null
+
+    def either[A,B](x : Either[A,B]) =
+      x match {
+        case Right(x) => Some(x)
+        case Left(_)  => None
+      }
+
+    def execute( repository : Repository) {
+      val commits = for {
+        id     <- Option(tickets).flatMap(_.asScala.headOption)
+        ticket <- either(repository.ticket(id))
+        scm    <- repository.current.scm(repository)
+      } yield scm.commits(ticket.id)
+      commits getOrElse { List() } foreach { case c =>
+        printf("[%s] %s\n%s\n", c.id, c.author, c.message)
+      }
+    }
+  } }
+
 }
