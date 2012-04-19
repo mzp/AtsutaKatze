@@ -1,4 +1,4 @@
-@(ticket : org.codefirst.katze.core.Ticket, form : Form[org.codefirst.katze.core.Ticket])
+@(form : Form[org.codefirst.katze.core.Ticket], ticket : org.codefirst.katze.core.Ticket, commits : Iterable[org.codefirst.katze.core.scm.Commit])
 
 @import helper.twitterBootstrap._
 
@@ -9,6 +9,15 @@
 
     <div class="form-actions">
       <input type="submit" value="Update" class="btn btn-primary"/>
+    </div>
+  }
+
+  <h2>Related commits</h2>
+  @commits.map { commit =>
+    <div>
+      <h2>@commit.author</h2>
+      <div>ID: @commit.id</div>
+      <div>@commit.message</div>
     </div>
   }
 }

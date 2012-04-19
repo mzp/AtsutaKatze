@@ -42,7 +42,8 @@ object Application extends Controller {
     Katze.repository.ticket(id) match {
       case Right(t) =>
         val form = ticketForm.fill(t)
-        Ok(views.html.editTicket(t, form))
+        val commits = Katze.repository.current.commits( Katze.repository, t)
+        Ok(views.html.editTicket(form, t, commits))
       case Left(reason) =>
         BadRequest(reason)
     }

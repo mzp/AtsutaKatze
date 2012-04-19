@@ -162,8 +162,7 @@ object DefaultCommands extends CommandDefinition {
       val commits = for {
         id     <- Option(tickets).flatMap(_.asScala.headOption)
         ticket <- either(repository.ticket(id))
-        scm    <- repository.current.scm(repository)
-      } yield scm.commits(ticket.id)
+      } yield repository.current.commits(repository, ticket)
       commits getOrElse { List() } foreach { case c =>
         printf("[%s] %s\n%s\n", c.id, c.author, c.message)
       }

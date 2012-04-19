@@ -10,6 +10,13 @@ case class Project(
     repository.config(this).scm map {
       new Git(_)
     }
+
+  def commits(repository : Repository, ticket : Ticket) : Iterable[Commit] =
+    scm(repository) map {
+      _.commits(ticket.id)
+    } getOrElse {
+      Seq()
+    }
 }
 
 object Project {
