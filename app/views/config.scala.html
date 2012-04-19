@@ -1,0 +1,15 @@
+@(form : Form[org.codefirst.katze.core.ProjectConfig])
+
+@import helper.twitterBootstrap._
+
+@main("Edit Ticket"){
+  <h1>Project config</h1>
+  @helper.form(action = routes.Application.updateConfig()) {
+    @helper.inputText(form("scm"))
+
+    <div class="form-actions">
+      <input type="submit" value="Update" class="btn btn-primary"/>
+    </div>
+  }
+}
+

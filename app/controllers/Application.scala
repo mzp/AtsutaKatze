@@ -16,6 +16,12 @@ object Application extends Controller {
     )(Ticket.make(_, Open))( t => Some(t.subject))
   }
 
+  val projectConfigForm = Form {
+    mapping(
+      "scm" -> optional(nonEmptyText)
+    )(ProjectConfig.apply _)(ProjectConfig.unapply _)
+  }
+
   def index = Action {
     val tickets = Katze.repository.current.tickets
     Ok(views.html.index(tickets))
@@ -66,5 +72,17 @@ object Application extends Controller {
   def changes = Action {
     val changes = Katze.repository.changes
     Ok(views.html.changes(changes))
+  }
+
+  def config = Action {
+    val config = Katze.repository.config(Katze.repository.current)
+    val form = projectConfigForm.fill(config)
+    Ok(views.html.config(form))
+  }
+
+  def updateConfig = Action { implicit request =>
+    val config = projectConfigForm.bindFromRequest.get
+    Katze.repository.updateConfig(Katze.repository.current) { case _ => config}
+    Redirect(routes.Application.index)
   }
 }
