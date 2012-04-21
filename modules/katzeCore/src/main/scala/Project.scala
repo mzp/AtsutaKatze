@@ -8,7 +8,10 @@ case class Project(
 ) {
   def scm(repository : Repository) =
     repository.config(this).scm map {
-      new Git(_)
+      case s if s.startsWith("https") =>
+        new GitHub(s)
+      case s =>
+        new Git(s)
     }
 
   def commits(repository : Repository, ticket : Ticket) : Iterable[Commit] =
