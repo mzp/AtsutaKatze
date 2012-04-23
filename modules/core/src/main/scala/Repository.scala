@@ -37,7 +37,7 @@ class Repository(store : Store) {
 
   def ticket(id : String) : Either[String, Ticket] = {
     val xs =
-      current.tickets.filter(_.id.value.startsWith(id))
+      tickets.filter(_.id.value.startsWith(id))
     xs match {
       case List() =>
         Left("not found ticket")
@@ -48,11 +48,11 @@ class Repository(store : Store) {
     }
   }
 
-  // TODO: need file lock
-  def current : Project =
-    read[Project]("current") getOrElse {
-      Project.empty
+  def tickets : List[Ticket] = {
+    read[List[Ticket]]("current") getOrElse {
+      List()
     }
+  }
 
   // TODO: need file lock
   def apply(patch : Patch) {
@@ -62,23 +62,20 @@ class Repository(store : Store) {
       case None =>
         patch
     }
-    val project = next.action(current)
 
-    write("current", project)
+    write("current", next.action(tickets))
     write("patches/%s".format(next.id.value), next)
     write("head", next.id)
   }
 
-  def config(project : Project) : ProjectConfig = {
-    read[ProjectConfig]("config/%s".format(project.id.value)) getOrElse {
-      ProjectConfig.empty
+  def config : Config = {
+    read[Config]("config") getOrElse {
+      Config.empty
     }
   }
 
-  def updateConfig(project : Project)(f : ProjectConfig => ProjectConfig) {
-    val config =
-      f(this.config(project))
-    write("config/%s".format(project.id.value), config)
+  def updateConfig(f : Config => Config) {
+    write("config", f(this.config))
   }
 }
 

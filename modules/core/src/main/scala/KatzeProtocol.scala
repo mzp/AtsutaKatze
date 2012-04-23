@@ -19,11 +19,8 @@ object KatzeProtocol extends DefaultProtocol {
   implicit val TicketFormat : Format[Ticket] =
     asProduct3("uuid", "subject", "status")(Ticket.apply _)(Ticket.unapply(_).get)
 
-  implicit val ProjectFormat : Format[Project] =
-    asProduct2("id","tickets")(Project.apply _)(Project.unapply(_).get)
-
-  implicit val ProjectCOnfigFormat : Format[ProjectConfig] =
-    wrap("scm")(_.scm, ProjectConfig.apply _)
+  implicit val ConfigFormat : Format[Config] =
+    asProduct2("title", "scm")(Config.apply _)(Config.unapply(_).get)
 
   implicit val AddActionFormat : Format[AddAction] =
     wrap("ticket")(_.ticket, AddAction.apply _)

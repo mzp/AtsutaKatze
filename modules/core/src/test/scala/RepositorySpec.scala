@@ -64,7 +64,7 @@ class RepositorySpec extends Specification {
     repos.apply(Patch.make(DeleteAction(t1)))
 
     "現在のチケット一覧が取得できる" in {
-      repos.current.tickets must_== List(t3, t2)
+      repos.tickets must_== List(t3, t2)
     }
 
     "チケットが取得できる" in {
@@ -79,19 +79,19 @@ class RepositorySpec extends Specification {
   "プロジェクトごとの設定" should {
     "diffを生成しない" in {
       val repos =  repository()
-      repos.updateConfig(repos.current)(_)
+      repos.updateConfig(_)
       repos.changes must_== List()
     }
 
     "初期状態は空" in {
       val repos =  repository()
-      repos.config(repos.current) must_== ProjectConfig.empty
+      repos.config must_== Config.empty
     }
 
     "更新できる" in {
       val repos =  repository()
-      repos.updateConfig(repos.current)(_.copy(scm = Some("x")))
-      repos.config(repos.current).scm must_== Some("x")
+      repos.updateConfig(_.copy(scm = Some("x")))
+      repos.config.scm must_== Some("x")
     }
   }
 }
