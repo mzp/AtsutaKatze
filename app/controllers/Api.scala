@@ -20,7 +20,7 @@ object Api extends Controller {
         Ok(toJson(Map("status"-> JsString("ok"),
                       "content" ->json)))
       case None =>
-        NotFound(toJson(Map("status" -> "ng")))
+        NotFound(toJson(Map("status" -> "ng", "name" -> name)))
     }
   }
 
