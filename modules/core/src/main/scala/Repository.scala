@@ -4,6 +4,7 @@ import store._
 import java.util.Date
 import scala.collection.mutable.ListBuffer
 import java.io.File
+import org.codefirst.katze.core.scm.Commit
 import sjson.json.{Reads,Writes, JsonSerialization}
 
 class Repository(store : Store) {
@@ -77,6 +78,8 @@ class Repository(store : Store) {
   def updateConfig(f : Config => Config) {
     write("config", f(this.config))
   }
+
+  def commits(t : Ticket) : Iterable[Commit] = List()
 }
 
 object Repository {
