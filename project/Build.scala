@@ -3,18 +3,18 @@ import Keys._
 import PlayProject._
 
 object ApplicationBuild extends Build {
-
   val appName         = "katze"
   val appVersion      = "1.0-SNAPSHOT"
 
-  val appDependencies = Seq(
-    // Add your project dependencies here,
+  val appDependencies = Seq()
+
+  val core = Project("core", file("modules/core"))
+
+  val cli  = Project("cli", file("modules/cli")).dependsOn(
+    core
   )
 
-  val katzeCore = Project("katze-core", file("modules/katzeCore"))
-
-  val main = PlayProject(appName, appVersion, appDependencies, mainLang = SCALA).settings(
-    // Add your own project settings here
-  ).dependsOn(katzeCore)
-
+  val main = PlayProject(appName, appVersion, appDependencies, mainLang = SCALA).dependsOn(
+    core
+  )
 }
