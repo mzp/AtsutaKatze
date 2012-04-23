@@ -18,12 +18,13 @@ object Application extends Controller {
 
   val projectConfigForm = Form {
     mapping(
+      "title" -> text,
       "scm" -> optional(nonEmptyText)
-    )(ProjectConfig.apply _)(ProjectConfig.unapply _)
+    )(Config.apply _)(Config.unapply _)
   }
 
   def index = Action {
-    val tickets = Katze.repository.current.tickets
+    val tickets = Katze.repository.tickets
     Ok(views.html.index(tickets))
   }
 
@@ -42,7 +43,7 @@ object Application extends Controller {
     Katze.repository.ticket(id) match {
       case Right(t) =>
         val form = ticketForm.fill(t)
-        val commits = Katze.repository.current.commits( Katze.repository, t)
+        val commits = Katze.repository.commits(t)
         Ok(views.html.editTicket(form, t, commits))
       case Left(reason) =>
         BadRequest(reason)
@@ -76,14 +77,14 @@ object Application extends Controller {
   }
 
   def config = Action {
-    val config = Katze.repository.config(Katze.repository.current)
+    val config = Katze.repository.config
     val form = projectConfigForm.fill(config)
     Ok(views.html.config(form))
   }
 
   def updateConfig = Action { implicit request =>
     val config = projectConfigForm.bindFromRequest.get
-    Katze.repository.updateConfig(Katze.repository.current) { case _ => config}
+    Katze.repository.updateConfig { case _ => config}
     Redirect(routes.Application.index)
   }
 }

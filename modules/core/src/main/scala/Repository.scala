@@ -4,7 +4,7 @@ import store._
 import java.util.Date
 import scala.collection.mutable.ListBuffer
 import java.io.File
-import org.codefirst.katze.core.scm.Commit
+import org.codefirst.katze.core.scm._
 import sjson.json.{Reads,Writes, JsonSerialization}
 
 class Repository(store : Store) {
@@ -79,7 +79,16 @@ class Repository(store : Store) {
     write("config", f(this.config))
   }
 
-  def commits(t : Ticket) : Iterable[Commit] = List()
+  def commits(t : Ticket) : Iterable[Commit] = {
+    val scm =
+      config.scm map {
+        case s if s.startsWith("https://github.com") =>
+          new GitHub(s).commits(t.id)
+        case s =>
+          new Git(s).commits(t.id)
+      }
+    scm getOrElse { List() }
+  }
 }
 
 object Repository {
