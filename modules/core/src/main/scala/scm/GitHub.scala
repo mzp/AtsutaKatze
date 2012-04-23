@@ -4,6 +4,7 @@ import java.net.URI
 import scala.collection.JavaConverters._
 
 import dispatch.json._
+import sjson.json._
 
 import org.codefirst.katze.core._
 
@@ -11,6 +12,15 @@ class GitHub(val url : String,
              http : HttpExecutor = DefaultHttpExecutor) extends Scm {
   val uri = new URI(url)
   assert( uri.getHost == "github.com" )
+
+  type T = List[Commit]
+
+  def init =
+    List()
+
+  def format =
+    KatzeProtocol.listFormat(KatzeProtocol.CommitFormat)
+
 
   val (user : String, repos : String) =
     uri.getPath.split("/").toList match {
@@ -34,7 +44,7 @@ class GitHub(val url : String,
       case _ => obj.toString
     }
 
-  def logs : List[Commit] =
+  def fetch(s : T) : T =
     http.get("https://api.github.com/repos/%s/%s/commits".format(user, repos)) { in =>
       val JsArray(commits) = JsValue.fromStream(in)
       commits map { obj =>
@@ -45,7 +55,8 @@ class GitHub(val url : String,
       }
     }
 
-  def commits(id : ID[Ticket]) = {
+  def commits(logs : T, id : ID[Ticket]) = {
     logs.filter { _.message contains id.value }
   }
 }
+

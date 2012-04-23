@@ -8,8 +8,20 @@ import org.eclipse.jgit._
 import scala.collection.JavaConverters._
 
 import org.codefirst.katze.core.{ID,Ticket}
+import sjson.json.Primitives
 
-class Git(val url : String) extends Scm {
+class Git(val url : String) extends Scm with Primitives {
+  type T = Int
+
+  def init =
+    0
+
+  def fetch(state : T) =
+    state
+
+  def format =
+    IntFormat
+
   lazy val repos = {
     val builder = new FileRepositoryBuilder()
     val file =new java.io.File(url)
@@ -33,6 +45,6 @@ class Git(val url : String) extends Scm {
       case _ => Seq()
     }
 
-  def commits(id : ID[Ticket]) =
+  def commits(state : T, id : ID[Ticket]) =
     logs.filter { _.message contains id.value }
 }

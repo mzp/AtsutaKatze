@@ -79,15 +79,44 @@ class Repository(store : Store) {
     write("config", f(this.config))
   }
 
-  def commits(t : Ticket) : Iterable[Commit] = {
-    val scm =
-      config.scm map {
-        case s if s.startsWith("https://github.com") =>
-          new GitHub(s).commits(t.id)
-        case s =>
-          new Git(s).commits(t.id)
+  type SCM = {
+    def fetch : Unit
+    def commits(t : Ticket) : Iterable[Commit]
+  }
+
+  def scm : SCM = {
+    config.scm map { url =>
+      (new Object {
+        val scm = Scm(url)
+
+        def state : scm.T =
+          read[scm.T]("fetch/%s".format(url))(scm.format) getOrElse {
+            scm.init
+          }
+
+        def fetch {
+          val next =
+            scm.fetch(state)
+
+          write("fetch/%s".format(url), next)(scm.format)
+        }
+
+        def commits(t : Ticket) : Iterable[Commit] =
+          scm.commits(state, t.id)
+      } : SCM)
+    } getOrElse {
+      new Object {
+        def fetch {}
+        def commits(t : Ticket) = List()
       }
-    scm getOrElse { List() }
+    }
+  }
+
+  def fetch =
+    scm.fetch
+
+  def commits(t : Ticket) : Iterable[Commit] = {
+    scm.commits(t)
   }
 }
 

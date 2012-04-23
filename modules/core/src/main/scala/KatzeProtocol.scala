@@ -2,6 +2,8 @@ package org.codefirst.katze.core
 
 import sjson.json._
 import dispatch.json._
+import org.codefirst.katze.core.scm.Commit
+
 
 object KatzeProtocol extends DefaultProtocol {
   import JsonSerialization._
@@ -30,6 +32,9 @@ object KatzeProtocol extends DefaultProtocol {
 
   implicit val DeleteActionFormat : Format[DeleteAction] =
     wrap("ticket")(_.ticket, DeleteAction.apply _)
+
+  implicit val CommitFormat : Format[Commit] =
+    asProduct3("id", "author", "message")(Commit.apply _)(Commit.unapply(_).get)
 
   implicit object ActionFormat extends Format[Action] {
     def reads(json : JsValue) =

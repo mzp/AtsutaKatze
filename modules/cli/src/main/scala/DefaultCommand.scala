@@ -120,6 +120,15 @@ object DefaultCommands extends CommandDefinition {
     }
   } }
 
+    define("fetch") { new Command {
+    val description =
+      "fetch scm changes"
+
+    def execute( repos : Repository) {
+      repos.fetch
+    }
+  } }
+
   define("scm") { new Command {
     val description =
       "set repository"
