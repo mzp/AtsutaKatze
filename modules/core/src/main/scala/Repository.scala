@@ -145,10 +145,12 @@ object Repository {
   def open(uri : String) = {
     val x = new java.net.URI(uri)
     val store = x.getScheme match {
-      case "file" =>
-        new LocalStore(new File(x.getPath))
       case "http" =>
         new HttpStore(x)
+      case "file" =>
+        new LocalStore(new File(x.getPath))
+      case null =>
+        new LocalStore(new File(uri))
     }
     new Repository(store)
   }

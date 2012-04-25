@@ -22,7 +22,7 @@ object KatzeProtocol extends DefaultProtocol {
     asProduct3("uuid", "subject", "status")(Ticket.apply _)(Ticket.unapply(_).get)
 
   implicit val ConfigFormat : Format[Config] =
-    asProduct2("title", "scm")(Config.apply _)(Config.unapply(_).get)
+    asProduct3("title", "scm", "defaultUrl")(Config.apply _)(Config.unapply(_).get)
 
   implicit val AddActionFormat : Format[AddAction] =
     wrap("ticket")(_.ticket, AddAction.apply _)

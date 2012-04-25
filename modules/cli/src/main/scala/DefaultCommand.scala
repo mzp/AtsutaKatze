@@ -88,35 +88,55 @@ object DefaultCommands extends CommandDefinition {
         printf("%s %s\n", p.id.short, p.action.summary)
       }
     }
-  } }
+  }}
 
-  define("push") { new Command {
+
+  trait SavedUrl {
+    @Parameter(names = Array("-s","--save"), description = "save push url")
+    var save : Boolean = false
+
+    @Parameter(description = "")
+    var targets : java.util.List[String] =
+      new java.util.ArrayList()
+
+    def Url(repos : Repository)(action : String => Unit) {
+      val url = targets.asScala.headOption orElse {
+        repos.config.defaultUrl
+      }
+      url match {
+        case Some(u) =>
+          action(u)
+          if(save) {
+            repos.updateConfig {
+              _.copy(defaultUrl = Some(u))
+            }
+          }
+        case None =>
+          throw new RuntimeException("please specify push url")
+      }
+    }
+  }
+
+
+  define("push") { new Command with SavedUrl {
     val description =
       "push local changes"
 
-    @Parameter(description = "")
-    var targets : java.util.List[String] = null
-
-    def execute( repos : Repository) {
-      for( t <- targets.asScala ) {
-        val dest = Repository.open(t)
-        Repository.copy(repos, dest)
-      }
+    def execute( repos : Repository) = Url(repos) { url =>
+      println("push to " + url)
+      val dest = Repository.open(url)
+      Repository.copy(repos, dest)
     }
   } }
 
-  define("pull") { new Command {
+  define("pull") { new Command with SavedUrl {
     val description =
       "get remote changes"
 
-    @Parameter(description = "")
-    var targets : java.util.List[String] = null
-
-    def execute( repos : Repository) {
-      for( t <- targets.asScala.headOption ) {
-        val dest = Repository.open(t)
-        Repository.copy(dest, repos)
-      }
+    def execute( repos : Repository) = Url(repos) { url =>
+      println("pull from " + url)
+      val dest = Repository.open(url)
+      Repository.copy(dest, repos)
     }
   } }
 
