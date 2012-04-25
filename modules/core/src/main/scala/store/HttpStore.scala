@@ -1,8 +1,9 @@
 package org.codefirst.katze.core.store
 
-import dispatch.json.{JsValue, JsObject, JsString}
 import java.io.InputStream
-import org.codefirst.katze.core._
+import dispatch.json.{JsValue, JsObject, JsString}
+import org.codefirst.katze.util._
+import org.codefirst.katze.core.{HttpExecutor, DefaultHttpExecutor}
 
 class HttpStore(uri : java.net.URI,
                 http : HttpExecutor = DefaultHttpExecutor) extends Store {

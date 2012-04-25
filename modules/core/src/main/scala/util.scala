@@ -1,6 +1,6 @@
 package org.codefirst.katze
 
-package object core {
+object util {
   def using[A <: { def close() : Unit }, B](x : A)( f : A => B) : B =
     try {
       f(x)

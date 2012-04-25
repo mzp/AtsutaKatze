@@ -5,10 +5,9 @@ import play.api._
 import play.api.mvc._
 import play.api.data._
 import org.codefirst.katze.core._
-import org.codefirst.katze.core.store._
+import play.api.data.Forms._
 
 object Application extends Controller {
-  import play.api.data.Forms._
 
   val ticketForm  = Form {
     mapping(

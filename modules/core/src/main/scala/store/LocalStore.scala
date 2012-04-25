@@ -2,10 +2,9 @@ package org.codefirst.katze.core.store
 
 import java.io.{File, InputStream, FileInputStream, FileOutputStream}
 import dispatch.json.JsValue
+import org.codefirst.katze.util._
 
 class LocalStore(root : File) extends Store {
-  import org.codefirst.katze.core._
-
   root.mkdirs
 
   private def open_in(file : File) =
