@@ -22,6 +22,9 @@ class RepositorySpec extends Specification {
   def repository() =
     new Repository(new MemoryStore)
 
+  def noDepends(p : Patch) =
+      p.copy(depends = None)
+
   "初期状態" should {
     "headが空" in {
       repository().head must_== None
@@ -34,9 +37,6 @@ class RepositorySpec extends Specification {
     val p2 = Patch.make(AddAction(Ticket.make("bar",Open)))
     repos.apply(p1)
     repos.apply(p2)
-
-    def noDepends(p : Patch) =
-      p.copy(depends = None)
 
     "headが更新される" in {
       repos.head.map(noDepends(_)) must_== Some(p2)
@@ -92,6 +92,34 @@ class RepositorySpec extends Specification {
       val repos =  repository()
       repos.updateConfig(_.copy(scm = Some("x")))
       repos.config.scm must_== Some("x")
+    }
+  }
+
+  "push/pull" should {
+    val src = repository()
+    val p1 = Patch.make(AddAction(Ticket.make("foo",Open)))
+    val p2 = Patch.make(AddAction(Ticket.make("bar",Open)))
+
+    src.apply(p1)
+    src.apply(p2)
+
+    "push可能" in {
+      val repos = repository()
+      Repository.copy(src, repos)
+      repos.changes.map(noDepends(_)) must_== List(p2, p1)
+    }
+
+    "push不可" in {
+      val repos = repository()
+      repos.apply(p2)
+      Repository.copy(src, repos) must throwA[RuntimeException]
+    }
+
+    "push --force" in {
+      val repos = repository()
+      repos.apply(p2)
+      Repository.forceCopy(src, repos)
+      repos.changes.map(noDepends(_)) must_== List(p2, p1)
     }
   }
 }
