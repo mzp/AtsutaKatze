@@ -140,7 +140,7 @@ object DefaultCommands extends CommandDefinition {
     }
   } }
 
-    define("fetch") { new Command {
+  define("fetch") { new Command {
     val description =
       "fetch scm changes"
 
