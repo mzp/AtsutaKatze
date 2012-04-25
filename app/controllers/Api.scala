@@ -30,4 +30,9 @@ object Api extends Controller {
     Katze.store.map(_.write(name, json))
     Ok(toJson(Map("status" -> "ok")))
   }
+
+  def delete(name : String) = Action {
+    Katze.store.map(_.remove(name))
+    Ok(toJson(Map("status" -> "ok")))
+  }
 }

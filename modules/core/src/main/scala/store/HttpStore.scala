@@ -22,5 +22,9 @@ class HttpStore(uri : java.net.URI,
   def write(name : String, value : JsValue) {
     http.put(entry + name, value.toString)
   }
+
+  def remove(name : String) {
+    http.delete(entry + name)
+  }
 }
 

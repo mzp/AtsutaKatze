@@ -30,6 +30,10 @@ class HttpStoreSpec extends Specification {
     def put(url : String, body : String) {
       map(url) = "{ \"content\" : %s }".format(body)
     }
+
+    def delete(url : String) {
+      map.remove(url)
+    }
   }
 
   val store =
@@ -46,5 +50,11 @@ class HttpStoreSpec extends Specification {
   "PUT" in {
     store.write("baz", JsNumber(1))
     store.read("baz") must_== Some(JsNumber(1))
+  }
+
+  "DELETE" in {
+    store.write("tmp_key", JsNumber(2))
+    store.remove("tmp_key")
+    store.read("tmp_key") must_== None
   }
 }

@@ -31,4 +31,8 @@ class LocalStore(root : File) extends Store {
       os.write(value.toString.getBytes)
     }
   }
+
+  def remove(name : String) {
+    file(name).delete
+  }
 }

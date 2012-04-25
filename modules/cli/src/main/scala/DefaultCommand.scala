@@ -95,9 +95,15 @@ object DefaultCommands extends CommandDefinition {
     @Parameter(names = Array("-s","--save"), description = "save push url")
     var save : Boolean = false
 
+
+    @Parameter(names = Array("-f","--force"), description = "force")
+    var force : Boolean =
+      false
+
     @Parameter(description = "")
     var targets : java.util.List[String] =
       new java.util.ArrayList()
+
 
     def Url(repos : Repository)(action : String => Unit) {
       val url = targets.asScala.headOption orElse {
@@ -115,6 +121,12 @@ object DefaultCommands extends CommandDefinition {
           throw new RuntimeException("please specify push url")
       }
     }
+
+    def copy(src : Repository, dest : Repository) =
+      if(force)
+        Repository.forceCopy(src, dest)
+      else
+        Repository.copy(src, dest)
   }
 
 
@@ -125,7 +137,7 @@ object DefaultCommands extends CommandDefinition {
     def execute( repos : Repository) = Url(repos) { url =>
       println("push to " + url)
       val dest = Repository.open(url)
-      Repository.copy(repos, dest)
+      copy(repos, dest)
     }
   } }
 
@@ -136,7 +148,7 @@ object DefaultCommands extends CommandDefinition {
     def execute( repos : Repository) = Url(repos) { url =>
       println("pull from " + url)
       val dest = Repository.open(url)
-      Repository.copy(dest, repos)
+      copy(dest, repos)
     }
   } }
 

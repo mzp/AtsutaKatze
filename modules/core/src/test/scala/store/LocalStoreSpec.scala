@@ -33,4 +33,12 @@ class LocalStoreSpec extends Specification {
       store.read("key") must_== Some(value)
     }
   }
+
+  "delete" should {
+    "キーを削除できる" in {
+      store.write("tmp_key", value)
+      store.remove("tmp_key")
+      store.read("tmp_key") must_== None
+    }
+  }
 }

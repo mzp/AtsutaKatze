@@ -42,4 +42,8 @@ class RedisStore(uri : String) extends Store {
   def write(name : String, value : JsValue) {
     redis { _.set(name, value.toString) }
   }
+
+  def remove(name : String) {
+    redis { _.del(name) }
+  }
 }

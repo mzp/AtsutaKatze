@@ -17,6 +17,14 @@ class Repository(store : Store) {
   private def write[T](name : String, obj : T)(implicit fjs : Writes[T]) : Unit =
     store.write(name, tojson(obj)(fjs))
 
+  private def remove(name : String) =
+    store.remove(name)
+
+  def clear {
+    remove("head")
+    remove("current")
+  }
+
   def head : Option[Patch] =
     read[ID[Patch]]("head").flatMap(patch(_))
 
@@ -137,6 +145,11 @@ object Repository {
     for( patch <- (from.changes diff to.changes).reverse ) {
       to.apply(patch)
     }
+  }
+
+  def forceCopy(from : Repository, to : Repository) {
+    to.clear
+    copy(from, to)
   }
 
   def local(path : String) =

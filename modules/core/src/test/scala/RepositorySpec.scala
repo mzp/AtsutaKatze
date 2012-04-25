@@ -17,6 +17,10 @@ class RepositorySpec extends Specification {
     def write(name : String, obj : JsValue) {
       map.update(name, obj)
     }
+
+    def remove(name : String) {
+      map.remove(name)
+    }
   }
 
   def repository() =

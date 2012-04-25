@@ -6,4 +6,5 @@ import dispatch.json._
 trait Store {
   def read(name : String) : Option[JsValue]
   def write(name : String, value : JsValue) : Unit
+  def remove(name : String) : Unit
 }

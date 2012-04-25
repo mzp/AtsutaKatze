@@ -19,7 +19,8 @@ object Application extends Controller {
   val projectConfigForm = Form {
     mapping(
       "title" -> text,
-      "scm" -> optional(nonEmptyText)
+      "scm" -> optional(nonEmptyText),
+      "defaultUrl" -> optional(text)
     )(Config.apply _)(Config.unapply _)
   }
 

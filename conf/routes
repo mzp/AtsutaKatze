@@ -12,6 +12,7 @@ POST    /remove/:id                 controllers.Application.removeTicket(id : St
 GET     /changes                    controllers.Application.changes
 GET     /api/v1/*name               controllers.Api.get(name)
 PUT     /api/v1/*name               controllers.Api.put(name)
+DELETE  /api/v1/*name               controllers.Api.delete(name)
 GET     /config                     controllers.Application.config
 POST    /config                     controllers.Application.updateConfig
 

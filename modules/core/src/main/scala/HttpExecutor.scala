@@ -6,6 +6,7 @@ import dispatch._
 trait HttpExecutor {
   def put(url : String, body : String) : Unit
   def get[T](url : String)(f : InputStream => T) : T
+  def delete(url : String) : Unit
 }
 
 object DefaultHttpExecutor extends HttpExecutor {
@@ -14,4 +15,7 @@ object DefaultHttpExecutor extends HttpExecutor {
 
   def get[T](url : String)(f : InputStream => T) =
     Http(dispatch.url(url) >> f)
+
+  def delete(url : String) =
+    Http(dispatch.url(url).DELETE  <:< Map("Content-Type" -> "application/json") >|)
 }
