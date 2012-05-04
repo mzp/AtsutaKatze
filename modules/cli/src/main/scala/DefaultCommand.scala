@@ -150,6 +150,9 @@ object DefaultCommands extends CommandDefinition {
     } }
 
   withRepos("commits", "show commits")(new Object {
+    @Parameter(names = Array("-n","--no-fetch"), description = "no fetch")
+    val no_fetch : Boolean = false
+
     @Parameter(description = "")
     var tickets : java.util.List[String] = null
   }) { (repos, params) =>
@@ -158,6 +161,9 @@ object DefaultCommands extends CommandDefinition {
         case Right(x) => Some(x)
         case Left(_)  => None
       }
+
+    if( !params.no_fetch )
+      repos.fetch
 
     val commits = for {
       id     <- Option(params.tickets).flatMap(_.asScala.headOption)
