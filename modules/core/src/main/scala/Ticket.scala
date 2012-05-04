@@ -20,7 +20,5 @@ case class Ticket(
 
 object Ticket {
   def make(subject : String, status : Status) =
-    Ticket(ID.get,
-           subject,
-           status)
+    Ticket(ID.get, subject, status)
 }

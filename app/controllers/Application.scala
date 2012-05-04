@@ -4,15 +4,20 @@ import java.io.File
 import play.api._
 import play.api.mvc._
 import play.api.data._
-import org.codefirst.katze.core._
+import org.codefirst.katze.core.{Status => KatzeStatus, _}
 import play.api.data.Forms._
 
 object Application extends Controller {
 
   val ticketForm  = Form {
     mapping(
-      "subject" -> nonEmptyText
-    )(Ticket.make(_, Open))( t => Some(t.subject))
+      "subject" -> nonEmptyText,
+      "status"  -> nonEmptyText
+    ){ (subject, status) =>
+      Ticket.make(subject, KatzeStatus.fromString(status))
+    } { t =>
+      Some((t.subject, t.status.toString.toLowerCase))
+    }
   }
 
   val projectConfigForm = Form {
@@ -53,8 +58,13 @@ object Application extends Controller {
   def editTicket(id : String) = Action { implicit request =>
     Katze.repository.ticket(id) match {
       case Right(t) =>
-        val next = ticketForm.bindFromRequest.get
-        Katze.repository.apply(Patch.make(UpdateAction.subject(t, next.subject)))
+        val next =
+          ticketForm.bindFromRequest.get.copy(
+            id = t.id
+          )
+        val patch =
+          Patch.make(UpdateAction(t, next))
+        Katze.repository.apply( patch )
         Redirect(routes.Application.index)
       case Left(reason) =>
         BadRequest(reason)

@@ -7,6 +7,8 @@
   @helper.form(action = routes.Application.editTicket(ticket.id.value)) {
     @helper.inputText(form("subject"))
 
+    @helper.select(form("status"), helper.options( List("open", "close")))
+
     <div class="form-actions">
       <input type="submit" value="Update" class="btn btn-primary"/>
     </div>
