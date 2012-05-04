@@ -87,4 +87,9 @@ object Application extends Controller {
     Katze.repository.updateConfig { case _ => config}
     Redirect(routes.Application.index)
   }
+
+  def fetch = Action {
+    Katze.repository.fetch
+    Ok("ok")
+  }
 }

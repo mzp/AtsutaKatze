@@ -15,6 +15,7 @@ PUT     /api/v1/*name               controllers.Api.put(name)
 DELETE  /api/v1/*name               controllers.Api.delete(name)
 GET     /config                     controllers.Application.config
 POST    /config                     controllers.Application.updateConfig
+POST    /fetch                      controllers.Application.fetch
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)
