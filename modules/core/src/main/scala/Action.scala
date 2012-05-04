@@ -35,8 +35,10 @@ case class UpdateAction(
 object UpdateAction {
   def subject(t : Ticket, subject : String) =
     UpdateAction(t, t.copy(subject = subject))
-}
 
+  def status(t : Ticket, status : Status) =
+    UpdateAction(t, t.copy(status = status))
+}
 
 case class DeleteAction(
   ticket : Ticket

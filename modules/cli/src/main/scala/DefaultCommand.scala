@@ -42,6 +42,27 @@ object DefaultCommands extends CommandDefinition {
     repos.apply(Patch.make(AddAction(ticket)))
   }
 
+  withRepos("status", "change status") {
+    new Object {
+      @Parameter(description = "")
+      val args : java.util.List[String] = null
+    }
+  } { (repos, params) =>
+    params.args.asScala.toList match {
+      case List(status, id) =>
+        repos.ticket(id) match {
+          case Left(str) =>
+            println(str)
+          case Right(t) =>
+            val patch =
+              Patch.make(UpdateAction.status(t, Status.fromString(status)))
+            repos.apply(patch)
+        }
+      case _ =>
+        throw new RuntimeException("too much arguments")
+    }
+  }
+
   withRepos("mv", "rename ticket") {
     new Object {
       @Parameter(names = Array("-s"), description = "subject")
