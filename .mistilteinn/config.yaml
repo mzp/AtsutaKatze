@@ -1,6 +1,8 @@
 ticket:
   # redmine, github or gitconfig
-  source: redmine
+  source: atsuta_katze
+
+atsuta_katze:
 
 redmine:
   url: https://codefirst.org/redmine
