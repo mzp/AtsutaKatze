@@ -17,5 +17,5 @@ object DefaultHttpExecutor extends HttpExecutor {
     Http(dispatch.url(url) >> f)
 
   def delete(url : String) =
-    Http(dispatch.url(url).DELETE  <:< Map("Content-Type" -> "application/json") >|)
+    Http(dispatch.url(url).DELETE >|)
 }
