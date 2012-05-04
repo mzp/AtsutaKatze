@@ -6,6 +6,7 @@ import org.codefirst.katze.core._
 
 object DefaultCommands extends CommandDefinition {
   import scala.collection.JavaConverters._
+  object NoParams
 
   define("list") { new Command {
     val description =
@@ -15,196 +16,158 @@ object DefaultCommands extends CommandDefinition {
       Map(Open  -> " ",
           Close -> "x" )
 
-    def execute(repos : Repository) {
-      for(t <- repos.tickets) {
+  withRepos("list", "show all tickets") {
+    new Object {
+      @Parameter(names = Array("-a","--active"), description = "only active ticket")
+      val active_only : Boolean = false
+    } } { (repos, params) =>
+      val status : Map[Status, String] =
+        Map(Open  -> " ",
+            Close -> "x" )
+
+      for{
+        t <- repos.tickets
+        if (params.active_only == false) || (t.status == Open)
+      } {
         printf("%s %s %s\n",
                t.id.value,
                status(t.status),
                t.subject)
       }
     }
-  } }
 
-  define("add") { new Command {
-    val description =
-      "add ticket"
-
-    @Parameter(names = Array("-s"), description = "subject")
-    var subject : String = ""
-
-    def execute( repos : Repository) {
-      val ticket = Ticket.make(subject,Open)
-      repos.apply(Patch.make(AddAction(ticket)))
+  withRepos("add", "add new ticket") {
+    new Object {
+      @Parameter(names = Array("-s"), description = "subject")
+      val subject : String = ""
     }
-  } }
-
-  define("mv") { new Command {
-    val description =
-      "rename ticket"
-
-    @Parameter(names = Array("-s"), description = "subject")
-    var subject : String = ""
-
-    @Parameter(description = "")
-    var ids : java.util.List[String] = null
-
-    def execute(repos : Repository) {
-      for(id <- ids.asScala) {
-        repos.ticket(id) match {
-          case Left(str) =>
-            println(str)
-          case Right(t) =>
-            repos.apply(Patch.make(UpdateAction.subject(t, subject)))
-        }
-      }
-    }
-  } }
-
-  define("rm") { new Command {
-    val description =
-      "remove ticket"
-
-    @Parameter(description = "")
-    var ids : java.util.List[String] = null
-
-    def execute(repos : Repository) {
-      for(id <- ids.asScala) {
-        repos.ticket(id) match {
-          case Left(str) =>
-            println(str)
-          case Right(t) =>
-            repos.apply(Patch.make(DeleteAction(t)))
-        }
-      }
-    }
-  } }
-
-  define("changes") { new Command {
-    val description =
-      "show changes"
-
-    def execute( repos : Repository) {
-      for(p <- repos.changes) {
-        printf("%s %s\n", p.id.short, p.action.summary)
-      }
-    }
-  }}
-
-
-  trait SavedUrl {
-    @Parameter(names = Array("-s","--save"), description = "save push url")
-    var save : Boolean = false
-
-
-    @Parameter(names = Array("-f","--force"), description = "force")
-    var force : Boolean =
-      false
-
-    @Parameter(description = "")
-    var targets : java.util.List[String] =
-      new java.util.ArrayList()
-
-
-    def Url(repos : Repository)(action : String => Unit) {
-      val url = targets.asScala.headOption orElse {
-        repos.config.defaultUrl
-      }
-      url match {
-        case Some(u) =>
-          action(u)
-          if(save) {
-            repos.updateConfig {
-              _.copy(defaultUrl = Some(u))
-            }
-          }
-        case None =>
-          throw new RuntimeException("please specify push url")
-      }
-    }
-
-    def copy(src : Repository, dest : Repository) =
-      if(force)
-        Repository.forceCopy(src, dest)
-      else
-        Repository.copy(src, dest)
+  } { (repos, params) =>
+    val ticket = Ticket.make(params.subject,Open)
+    repos.apply(Patch.make(AddAction(ticket)))
   }
 
+  withRepos("mv", "rename ticket") {
+    new Object {
+      @Parameter(names = Array("-s"), description = "subject")
+      val subject : String = ""
 
-  define("push") { new Command with SavedUrl {
-    val description =
-      "push local changes"
-
-    def execute( repos : Repository) = Url(repos) { url =>
-      println("push to " + url)
-      val dest = Repository.open(url)
-      copy(repos, dest)
+      @Parameter(description = "")
+      val ids : java.util.List[String] = null
     }
-  } }
-
-  define("pull") { new Command with SavedUrl {
-    val description =
-      "get remote changes"
-
-    def execute( repos : Repository) = Url(repos) { url =>
-      println("pull from " + url)
-      val dest = Repository.open(url)
-      copy(dest, repos)
-    }
-  } }
-
-  define("fetch") { new Command {
-    val description =
-      "fetch scm changes"
-
-    def execute( repos : Repository) {
-      repos.fetch
-    }
-  } }
-
-  define("scm") { new Command {
-    val description =
-      "set repository"
-
-    @Parameter(description = "")
-    var repositories : java.util.List[String] = null
-
-    def execute( repos : Repository) {
-      Option(repositories).flatMap(_.asScala.headOption) match {
-        case None =>
-          val scm =
-             repos.config.scm getOrElse { "none" }
-          println(scm)
-        case Some(url) =>
-          // write mode
-          repos.updateConfig {
-            _.copy(scm = Some(url))
-          }
+  } { (repos, params) =>
+    for(id <- params.ids.asScala) {
+      repos.ticket(id) match {
+        case Left(str) =>
+          println(str)
+        case Right(t) =>
+          repos.apply(Patch.make(UpdateAction.subject(t, params.subject)))
       }
     }
-  } }
+  }
 
-  define("commits") { new Command {
-    val description =
-      "show related commits"
+  withRepos("rm", "remove ticket") {
+    new Object {
+      @Parameter(description = "")
+      val ids : java.util.List[String] = null
+    }
+  } { (repos, params) =>
+    for(id <- params.ids.asScala) {
+      repos.ticket(id) match {
+        case Left(str) =>
+          println(str)
+        case Right(t) =>
+          repos.apply(Patch.make(DeleteAction(t)))
+      }
+    }
+  }
+
+  withRepos("changes", "show changes")(NoParams) { (repos, _)  =>
+    for(p <- repos.changes) {
+      printf("%s %s\n", p.id.short, p.action.summary)
+    }
+  }
+
+  class SavedUrlParams {
+    @Parameter(names = Array("-s","--save"), description = "save push url")
+    val save : Boolean = false
+
+    @Parameter(names = Array("-f","--force"), description = "force")
+    val force : Boolean = false
 
     @Parameter(description = "")
-    var tickets : java.util.List[String] = null
+    val targets : java.util.List[String] = new java.util.ArrayList()
+  }
 
+  def Url(action : (String, Repository, SavedUrlParams) => Unit) (repos : Repository, params : SavedUrlParams) {
+    val url = params.targets.asScala.headOption orElse {
+      repos.config.defaultUrl
+    }
+    url match {
+      case Some(u) =>
+        action(u, repos, params)
+      if(params.save) {
+        repos.updateConfig {
+          _.copy(defaultUrl = Some(u))
+        }
+      }
+      case None =>
+        throw new RuntimeException("please specify push url")
+    }
+  }
+
+  def copy(params : SavedUrlParams, src : Repository, dest : Repository) =
+    if(params.force)
+      Repository.forceCopy(src, dest)
+    else
+        Repository.copy(src, dest)
+
+  withRepos("push", "push changes to remote repository")(new SavedUrlParams) { Url{(url, repos, params) =>
+    println("push to " + url)
+    val dest = Repository.open(url)
+    copy(params, repos, dest)
+  } }
+
+  withRepos("pull","pull changes from remote repository")(new SavedUrlParams) { Url{(url, repos, params) =>
+    println("pull from " + url)
+    val dest = Repository.open(url)
+    copy(params, dest, repos)
+  } }
+
+  withRepos("fetch", "fetch scm changes")(NoParams) { (repos, _) =>
+    repos.fetch
+  }
+
+  withRepos("scm","set/get repository")( new Object {
+    @Parameter(description = "")
+    var repositories : java.util.List[String] = null
+  }) { (repos, params) =>
+    Option(params.repositories).flatMap(_.asScala.headOption) match {
+      case None =>
+        val scm =
+          repos.config.scm getOrElse { "none" }
+        println(scm)
+      case Some(url) =>
+        // write mode
+        repos.updateConfig {
+          _.copy(scm = Some(url))
+        }
+    } }
+
+  withRepos("commits", "show commits")(new Object {
+    @Parameter(description = "")
+    var tickets : java.util.List[String] = null
+  }) { (repos, params) =>
     def either[A,B](x : Either[A,B]) =
       x match {
         case Right(x) => Some(x)
         case Left(_)  => None
       }
 
-    def execute( repository : Repository) {
-      val commits = for {
-        id     <- Option(tickets).flatMap(_.asScala.headOption)
-        ticket <- either(repository.ticket(id))
-      } yield repository.commits(ticket)
-      commits getOrElse { List() } foreach { case c =>
-        printf("[%s] %s\n%s\n", c.id, c.author, c.message)
-      }
-    }
+    val commits = for {
+      id     <- Option(params.tickets).flatMap(_.asScala.headOption)
+      ticket <- either(repos.ticket(id))
+    } yield repos.commits(ticket)
+    commits getOrElse { List() } foreach { case c =>
+      printf("[%s] %s\n%s\n", c.id, c.author, c.message)
   } }
-
 }
