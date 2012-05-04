@@ -1,5 +1,4 @@
 package org.codefirst.katze.cli
-
 import java.io.File
 import com.beust.jcommander._
 import org.codefirst.katze.core._
@@ -8,13 +7,10 @@ object DefaultCommands extends CommandDefinition {
   import scala.collection.JavaConverters._
   object NoParams
 
-  define("list") { new Command {
-    val description =
-      "show all tickets"
-
-    val status : Map[Status, String] =
-      Map(Open  -> " ",
-          Close -> "x" )
+  withoutRepos("init", "initialize katze repository")(NoParams) { _ =>
+    val katze = new File(".katze")
+    katze.mkdirs
+  }
 
   withRepos("list", "show all tickets") {
     new Object {
