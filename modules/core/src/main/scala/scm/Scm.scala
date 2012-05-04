@@ -1,11 +1,13 @@
 package org.codefirst.katze.core.scm
 
 import org.codefirst.katze.core.{ID,Ticket}
+import java.util.Date
 
 case class Commit(
   id : String,
   author  : String,
-  message : String
+  message : String,
+  createdAt : Date = new Date()
 )
 
 trait Scm {

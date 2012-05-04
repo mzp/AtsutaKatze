@@ -34,7 +34,7 @@ object KatzeProtocol extends DefaultProtocol {
     wrap("ticket")(_.ticket, DeleteAction.apply _)
 
   implicit val CommitFormat : Format[Commit] =
-    asProduct3("id", "author", "message")(Commit.apply _)(Commit.unapply(_).get)
+    asProduct4("id", "author", "message","createdAt")(Commit.apply _)(Commit.unapply(_).get)
 
   implicit object ActionFormat extends Format[Action] {
     def reads(json : JsValue) =

@@ -1,10 +1,13 @@
 package org.codefirst.katze.core.scm
 
+import java.util.Date
+
 import org.eclipse.jgit.storage.file._
 import org.eclipse.jgit.api._
 import org.eclipse.jgit.api.{Git => JGit}
 import org.eclipse.jgit.errors._
 import org.eclipse.jgit._
+import org.eclipse.jgit.lib._
 import scala.collection.JavaConverters._
 
 import org.codefirst.katze.core.{ID,Ticket}
@@ -37,9 +40,10 @@ class Git(val url : String) extends Scm with Primitives {
       val git = new JGit(repos)
       git.log().call().asScala.map { c =>
         Commit(
-          c.getId.toString,
+          ObjectId.toString(c.getId),
           c.getAuthorIdent.getName,
-          c.getFullMessage)
+          c.getFullMessage.trim,
+          new Date(c.getCommitTime.toLong * 1000))
       }
     } catch {
       case _ => Seq()
