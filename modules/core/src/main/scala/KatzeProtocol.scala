@@ -36,8 +36,37 @@ object KatzeProtocol extends DefaultProtocol {
   implicit val DateFormat : Format[java.util.Date] =
     wrap("date")(_.getTime(), new java.util.Date((_ : Long)))
 
+
+  def multiple[T](x : Format[T])(y : Format[T]) : Format[T] =
+    new Format[T] {
+      def writes(t: T) =
+        try {
+          tojson(t)(x)
+        } catch {
+          case _ =>
+            tojson(t)(y)
+        }
+
+      def reads(json: JsValue) =
+        try {
+          fromjson(json)(x)
+        } catch {
+          case _ =>
+            fromjson(json)(y)
+        }
+    }
+
   implicit val CommitFormat : Format[Commit] =
-    asProduct4("id", "author", "message","createdAt")(Commit.apply _)(Commit.unapply(_).get)
+    multiple {
+      asProduct4("id", "author", "message","createdAt")(Commit.apply _)(Commit.unapply(_).get)
+    } {
+      asProduct3("id", "author", "message") {
+        (id : String, author : String, message : String) =>
+          Commit(id, author, message)
+      } { c =>
+        (c.id, c.author, c.message)
+      }
+    }
 
   implicit object ActionFormat extends Format[Action] {
     def reads(json : JsValue) =
