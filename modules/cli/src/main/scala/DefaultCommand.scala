@@ -2,9 +2,10 @@ package org.codefirst.katze.cli
 import java.io.File
 import com.beust.jcommander._
 import org.codefirst.katze.core._
+import scala.collection.JavaConverters._
 
 object DefaultCommands extends CommandDefinition {
-  import scala.collection.JavaConverters._
+
   object NoParams
 
   withoutRepos("init", "initialize katze repository")(NoParams) { _ =>
@@ -170,27 +171,6 @@ object DefaultCommands extends CommandDefinition {
         }
     } }
 
-  withRepos("commits", "show commits")(new Object {
-    @Parameter(names = Array("-n","--no-fetch"), description = "no fetch")
-    val no_fetch : Boolean = false
-
-    @Parameter(description = "")
-    var tickets : java.util.List[String] = null
-  }) { (repos, params) =>
-    def either[A,B](x : Either[A,B]) =
-      x match {
-        case Right(x) => Some(x)
-        case Left(_)  => None
-      }
-
-    if( !params.no_fetch )
-      repos.fetch
-
-    val commits = for {
-      id     <- Option(params.tickets).flatMap(_.asScala.headOption)
-      ticket <- either(repos.ticket(id))
-    } yield repos.commits(ticket)
-    commits getOrElse { List() } foreach { case c =>
-      printf("[%s] %s\n%s\n", c.id, c.author, c.message)
-  } }
+  ListCommand(this)
 }
+

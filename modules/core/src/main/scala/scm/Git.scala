@@ -52,3 +52,4 @@ class Git(val url : String) extends Scm with Primitives {
   def commits(state : T, id : ID[Ticket]) =
     logs.filter { _.message contains id.value }
 }
+
