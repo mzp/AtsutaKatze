@@ -1,6 +1,7 @@
 @(form : Form[org.codefirst.katze.core.Ticket], ticket : org.codefirst.katze.core.Ticket, commits : Iterable[org.codefirst.katze.core.scm.Commit])
 
 @import helper.twitterBootstrap._
+@import org.codefirst.katze.core.scm.Commit
 
 @main("Edit Ticket"){
   <h1>Edit: @ticket.id.value</h1>
@@ -15,12 +16,25 @@
   }
 
   <h2>Related commits</h2>
-  @commits.map { commit =>
-    <div>
-      <h2>@commit.author</h2>
-      <div>ID: @commit.id</div>
-      <div>@commit.message</div>
-    </div>
-  }
+  <div class="well commits">
+    @Commit.uniq(commits.toList).map { commit =>
+      @commit match {
+        case Left(n) => {
+          <div class="commit">
+            <div class="id"><span class="badge badge-warning">@n.count now commits</span></div>
+            <div class="info">from @n.from to @n.to</div>
+          </div>
+        }
+        case Right(c) => {
+          <div class="commit">
+            <div class="id"><span class="badge badge-success">commit @c.id</span></div>
+            <div class="info">by @c.author at @c.createdAt</div>
+            <p class="message">
+              @Html(c.message.lines.mkString("<br />"))
+            </p>
+          </div>
+          }
+          } }
+  </div>
 }
 

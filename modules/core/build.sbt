@@ -18,3 +18,4 @@ scalacOptions += "-unchecked"
 
 testOptions in Test += Tests.Argument("junitxml", "console")
 
+

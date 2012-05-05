@@ -16,3 +16,30 @@ table.tickets {
 h1 {
     margin-bottom: 10px;
 }
+
+.commits {
+    background-color: #fff;
+    padding-top: 9px;
+    padding-bottom: 9px;
+}
+
+.commit {
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+    padding: 10px 2px;
+}
+
+.commit:first-child {
+    border-top-width: 0px;
+}
+
+.info {
+    color: gray;
+    margin-left: 10px;
+}
+
+.message {
+    margin-top: 10px;
+    margin-left: 15px;
+    line-height: 1.0;
+    margin-bottom: 0px;
+}
