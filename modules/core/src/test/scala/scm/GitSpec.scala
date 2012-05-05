@@ -5,6 +5,11 @@ import org.codefirst.katze.core._
 import java.util.GregorianCalendar
 
 class GitSpec extends Specification {
+
+  override def is =
+    args(sequential=true) ^ end
+
+
   val command = """
 rm -rf /tmp/katze-test/git
 mkdir -p /tmp/katze-test/git
