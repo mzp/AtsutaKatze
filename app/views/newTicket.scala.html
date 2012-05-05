@@ -7,6 +7,7 @@
   @helper.form(action = routes.Application.newTicket) {
     @helper.inputText(form("subject"))
 
+    <input type="hidden" name="status" value="open" />
     <div class="form-actions">
       <input type="submit" value="Create" class="btn btn-primary"/>
     </div>
