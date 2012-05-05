@@ -10,6 +10,8 @@ libraryDependencies += "junit" % "junit" % "4.9" % "test"
 
 libraryDependencies += "org.eclipse.jgit" % "org.eclipse.jgit" % "1.3.0.201202151440-r"
 
+libraryDependencies += "commons-lang" % "commons-lang" % "2.6"
+
 scalacOptions += "-deprecation"
 
 scalacOptions += "-unchecked"

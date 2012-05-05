@@ -1,12 +1,16 @@
 package org.codefirst.katze.core.scm
 
 import java.net.URI
+import org.apache.commons.lang.time.DateUtils
+import java.util.Date;
 import scala.collection.JavaConverters._
 
 import dispatch.json._
 import sjson.json._
 
 import org.codefirst.katze.core._
+import org.codefirst.katze.core.KatzeProtocol._
+
 
 class GitHub(val url : String,
              http : HttpExecutor = DefaultHttpExecutor) extends Scm {
@@ -18,9 +22,11 @@ class GitHub(val url : String,
   def init =
     List()
 
-  def format =
-    KatzeProtocol.listFormat(KatzeProtocol.CommitFormat)
+  def findFormat(implicit fmt : Format[T]) =
+    fmt
 
+  def format =
+    findFormat
 
   val (user : String, repos : String) =
     uri.getPath.split("/").toList match {
@@ -44,6 +50,12 @@ class GitHub(val url : String,
       case _ => obj.toString
     }
 
+  private def parseDate(str : String) : Date = {
+    val parsePatterns =
+      Array("yyyy-MM-dd'T'HH:mm:ssZZ")
+    DateUtils.parseDate(str, parsePatterns)
+  }
+
   def fetch(s : T) : T =
     http.get("https://api.github.com/repos/%s/%s/commits".format(user, repos)) { in =>
       val JsArray(commits) = JsValue.fromStream(in)
@@ -51,7 +63,8 @@ class GitHub(val url : String,
         val commit = field(obj, "commit")
         Commit(str(field(obj, "sha")),
                str(field(field(commit, "author"), "name")),
-               str(field(commit, "message")))
+               str(field(commit, "message")),
+               parseDate(str(field(field(commit, "author"), "date"))))
       }
     }
 

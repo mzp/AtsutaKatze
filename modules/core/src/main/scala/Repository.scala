@@ -1,5 +1,7 @@
 package org.codefirst.katze.core
 
+import java.net.URLEncoder
+
 import store._
 import java.util.Date
 import scala.collection.mutable.ListBuffer
@@ -95,18 +97,21 @@ class Repository(store : Store) {
   def scm : SCM = {
     config.scm map { url =>
       (new Object {
-        val scm = Scm(url)
+        val scm =
+          Scm(url)
+
+        val key =
+          "fetch/%s".format(URLEncoder.encode(url, "UTF-8"))
 
         def state : scm.T =
-          read[scm.T]("fetch/%s".format(url))(scm.format) getOrElse {
+          read[scm.T](key)(scm.format) getOrElse {
             scm.init
           }
 
         def fetch {
           val next =
             scm.fetch(state)
-
-          write("fetch/%s".format(url), next)(scm.format)
+          write(key, next)(scm.format)
         }
 
         def commits(t : Ticket) : Iterable[Commit] =

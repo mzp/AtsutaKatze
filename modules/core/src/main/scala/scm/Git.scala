@@ -43,7 +43,7 @@ class Git(val url : String) extends Scm with Primitives {
           ObjectId.toString(c.getId),
           c.getAuthorIdent.getName,
           c.getFullMessage.trim,
-          new Date(c.getCommitTime.toLong * 1000))
+          c.getAuthorIdent.getWhen)
       }
     } catch {
       case _ => Seq()

@@ -33,6 +33,9 @@ object KatzeProtocol extends DefaultProtocol {
   implicit val DeleteActionFormat : Format[DeleteAction] =
     wrap("ticket")(_.ticket, DeleteAction.apply _)
 
+  implicit val DateFormat : Format[java.util.Date] =
+    wrap("date")(_.getTime(), new java.util.Date((_ : Long)))
+
   implicit val CommitFormat : Format[Commit] =
     asProduct4("id", "author", "message","createdAt")(Commit.apply _)(Commit.unapply(_).get)
 
@@ -68,9 +71,6 @@ object KatzeProtocol extends DefaultProtocol {
 
       }
   }
-
-  implicit val DateFormat : Format[java.util.Date] =
-    wrap("date")(_.getTime(), new java.util.Date((_ : Long)))
 
   implicit val PatchFormat : Format[Patch] =
     asProduct4("id", "action", "depends" , "createdAt")(Patch.apply _)(Patch.unapply(_).get)
