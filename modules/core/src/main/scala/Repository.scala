@@ -4,7 +4,7 @@ import java.net.URLEncoder
 
 import store._
 import java.util.Date
-import scala.collection.mutable.ListBuffer
+import scala.collection.immutable.Stream
 import java.io.File
 import org.codefirst.katze.core.scm._
 import sjson.json.{Reads,Writes, JsonSerialization}
@@ -33,17 +33,13 @@ class Repository(store : Store) {
   def patch(id : ID[Patch]) : Option[Patch] =
     read[Patch]("patches/%s".format(id.value))
 
-  def changes : List[Patch] =
-    head.map(changes(_)) getOrElse { List() }
+  def changes : Seq[Patch] =
+    head.map(changes(_)) getOrElse { Seq() }
 
-  private def changes(patch : Patch) : List[Patch] = {
-    val buffer : ListBuffer[Patch] = new ListBuffer
-    var p : Option[Patch] = Some(patch)
-    while(p != None){
-      buffer += (p.get)
-      p = p.get.depends.flatMap(this.patch(_))
-    }
-    buffer.toList
+  private def changes(patch : Patch) : Stream[Patch] = {
+    val depends : Stream[Patch] =
+      patch.depends.toStream.flatMap(this.patch(_))
+    patch #:: depends.flatMap(changes(_))
   }
 
   def ticket(id : String) : Either[String, Ticket] = {
@@ -143,11 +139,34 @@ object Repository {
     }
 
   def copy(from : Repository, to : Repository) {
-    if( ! isPushable(from, to) )
+    val head =
+      to.head
+
+    val changes =
+      from.changes
+
+    val isPushable =
+      head match {
+      case Some(head) =>
+        changes.contains(head)
+      case None =>
+        true
+    }
+
+    if( ! isPushable )
       throw new RuntimeException("not fast foward")
 
-    // TODO: more effective!
-    for( patch <- (from.changes diff to.changes).reverse ) {
+    val xs =
+      head match {
+        case None =>
+          changes
+        case Some(x) =>
+          printf("HEAD: %s\n", x.id)
+          changes takeWhile { p =>
+            p.id != x.id }
+      }
+    for( patch <- xs.reverse ) {
+      printf("Applying: %s", patch.id)
       to.apply(patch)
     }
   }

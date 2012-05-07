@@ -113,6 +113,13 @@ class RepositorySpec extends Specification {
       repos.changes.map(noDepends(_)) must_== List(p2, p1)
     }
 
+    "push可能" in {
+      val repos = repository()
+      repos.apply(p1)
+      Repository.copy(src, repos)
+      repos.changes.map(noDepends(_)) must_== List(p2, p1)
+    }
+
     "push不可" in {
       val repos = repository()
       repos.apply(p2)
