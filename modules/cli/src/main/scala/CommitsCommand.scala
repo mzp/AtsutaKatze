@@ -5,7 +5,7 @@ import scala.collection.JavaConverters._
 import Console._
 import java.util.Date
 
-object ListCommand {
+object CommitsCommand {
   def either[A,B](x : Either[A,B]) =
     x match {
       case Right(x) =>
@@ -48,10 +48,6 @@ object ListCommand {
             show(c)
         }
         println("")
-        /*        if(c.isNowCommit)
-          println("now")
-        else
-          show(c)*/
       } }
   }
 }

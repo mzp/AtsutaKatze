@@ -12,7 +12,7 @@ case class AddAction(
     ticket :: tickets
 
   override def summary =
-    "[addTicket]%s".format(ticket.subject)
+    "add-ticket: %s".format(ticket.subject)
 }
 
 case class UpdateAction(
@@ -30,7 +30,7 @@ case class UpdateAction(
     }
 
   override def summary =
-    "[updateicket]%s -> %s".format(from.subject, to.subject)
+    "update-ticket: %s".format(to.subject)
 }
 object UpdateAction {
   def subject(t : Ticket, subject : String) =
@@ -47,5 +47,5 @@ case class DeleteAction(
     tickets.filterNot(_.id == ticket.id)
 
   override def summary =
-    "[delTicket]%s".format(ticket.subject)
+    "delete-Ticket: %s".format(ticket.subject)
 }

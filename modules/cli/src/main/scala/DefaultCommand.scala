@@ -3,6 +3,7 @@ import java.io.File
 import com.beust.jcommander._
 import org.codefirst.katze.core._
 import scala.collection.JavaConverters._
+import Console._
 
 object DefaultCommands extends CommandDefinition {
 
@@ -99,12 +100,6 @@ object DefaultCommands extends CommandDefinition {
     }
   }
 
-  withRepos("changes", "show changes")(NoParams) { (repos, _)  =>
-    for(p <- repos.changes) {
-      printf("%s %s\n", p.id.short, p.action.summary)
-    }
-  }
-
   class SavedUrlParams {
     @Parameter(names = Array("-s","--save"), description = "save push url")
     val save : Boolean = false
@@ -171,6 +166,7 @@ object DefaultCommands extends CommandDefinition {
         }
     } }
 
-  ListCommand(this)
+  CommitsCommand(this)
+  ChangesCommand(this)
 }
 
