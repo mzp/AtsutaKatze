@@ -16,11 +16,11 @@
   }
 
   <h2>Related commits</h2>
-  <div class="well commits">
+  <div class="well commits activities">
     @Commit.uniq(commits.toList).map { commit =>
       @commit match {
         case Left(n) => {
-          <div class="commit">
+          <div class="commit activity">
             <div class="id"><span class="badge badge-warning">@n.count now commits</span></div>
             <div class="info">from @n.from to @n.to</div>
           </div>

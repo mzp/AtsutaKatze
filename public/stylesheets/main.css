@@ -17,18 +17,18 @@ h1 {
     margin-bottom: 10px;
 }
 
-.commits {
+.activities {
     background-color: #fff;
     padding-top: 9px;
     padding-bottom: 9px;
 }
 
-.commit {
+.activity {
     border-top: 1px solid rgba(0, 0, 0, 0.05);
     padding: 10px 2px;
 }
 
-.commit:first-child {
+.activity:first-child {
     border-top-width: 0px;
 }
 
@@ -43,3 +43,4 @@ h1 {
     line-height: 1.0;
     margin-bottom: 0px;
 }
+
